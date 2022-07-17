@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "@types/node": "^18.0.0",
+    "basic-ftp": "^4.6.6",
     "ssh2-sftp-client": "^9.0.1"
   },
   "devDependencies": {
