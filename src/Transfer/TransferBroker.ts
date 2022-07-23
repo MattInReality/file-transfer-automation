@@ -25,6 +25,10 @@ export class TransferBroker {
     this.transferDuplex = new TransferDuplexStream();
     this.source = ConnectionFactory.create(this.transferJob.sourceOptions);
     this.remote = ConnectionFactory.create(this.transferJob.remoteOptions);
+
+    this.transferDuplex.on("error", (err) => {
+      return this.error(err);
+    });
   }
 
   makeTransfer = async (): Promise<void> => {
@@ -37,8 +41,6 @@ export class TransferBroker {
   };
 
   error = (err: any) => {
-    this.source._close();
-    if (this.remote) this.remote._close();
     throw new Error(err.message);
   };
 }

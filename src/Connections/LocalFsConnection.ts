@@ -1,35 +1,41 @@
 import { Connection } from "./Connection";
-import type { ReadStream, WriteStream } from "fs";
 import { open } from "fs/promises";
 import { pipeline } from "stream/promises";
+import { Readable, Writable } from "stream";
 
 export class LocalFsConnection implements Connection {
-  _open() {}
+  _open() {
+    return Promise.resolve();
+  }
 
-  _close() {}
+  _close() {
+    return Promise.resolve();
+  }
 
-  upload = async (localPath: ReadStream, to: string): Promise<void> => {
+  upload = async (localPath: Readable, to: string): Promise<void> => {
     let writeStream;
     try {
       const file = await open(to, "w");
       writeStream = file.createWriteStream();
-      return await pipeline(localPath, writeStream);
+      await pipeline(localPath, writeStream);
+      return;
     } catch (e: any) {
-      console.log("LocalFsConnection writeStream error");
+      console.error("LocalFSConnection upload error!");
       throw new Error(e.message);
     } finally {
       await writeStream?.close();
     }
   };
 
-  download = async (remotePath: string, to: WriteStream): Promise<void> => {
+  download = async (remotePath: string, to: Writable): Promise<void> => {
     let readStream;
     try {
       const file = await open(remotePath);
       readStream = file.createReadStream();
-      return await pipeline(readStream, to);
+      await pipeline(readStream, to);
+      return;
     } catch (e: any) {
-      console.log("LocalFsConnection writeStream error");
+      console.error("LocalFSConnection download error!");
       throw new Error(e.message);
     } finally {
       await readStream?.close();

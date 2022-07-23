@@ -21,5 +21,6 @@ export class TransferDuplexStream extends Duplex {
 
   _final(callback: (error?: Error | null) => void) {
     this.push(null);
+    callback();
   }
 }

@@ -15,14 +15,28 @@ export class SftpConnection implements Connection {
   _close = async () => await this.client.end();
 
   download = async (remotePath: string, to: Writable): Promise<void> => {
-    await this._open();
-    await this.client.get(remotePath, to);
-    return await this._close();
+    try {
+      await this._open();
+      await this.client.get(remotePath, to);
+      return;
+    } catch (e: any) {
+      console.error("sFtpConnection download error!");
+      throw new Error(e.message);
+    } finally {
+      await this._close();
+    }
   };
 
   upload = async (localPath: Readable, to: string): Promise<void> => {
-    await this._open();
-    await this.client.put(localPath, to);
-    return await this._close();
+    try {
+      await this._open();
+      await this.client.put(localPath, to);
+      return;
+    } catch (e: any) {
+      console.error("sFtpConnection upload error!");
+      throw new Error(e.message);
+    } finally {
+      await this._close();
+    }
   };
 }
