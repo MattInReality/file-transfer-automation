@@ -1,4 +1,4 @@
-import { Connection, ConnectionOptions } from "./Connection";
+import { Connection, ConnectionOptions } from "./Connection.js";
 import * as ftp from "basic-ftp";
 import type { Client } from "basic-ftp";
 import { Readable, Writable } from "stream";

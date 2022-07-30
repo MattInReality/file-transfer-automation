@@ -1,9 +1,9 @@
-import { Connection } from "../Connections/Connection";
+import { Connection } from "../Connections/Connection.js";
 import {
   ConnectionFactory,
   ConnectionFactoryOptions,
-} from "../Connections/ConnectionFactory";
-import { TransferDuplexStream } from "./TransferDuplexStream";
+} from "../Connections/ConnectionFactory.js";
+import { TransferDuplexStream } from "./TransferDuplexStream.js";
 
 export interface TransferJob {
   sourceOptions: ConnectionFactoryOptions;

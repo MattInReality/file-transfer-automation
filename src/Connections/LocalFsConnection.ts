@@ -1,4 +1,4 @@
-import { Connection } from "./Connection";
+import { Connection } from "./Connection.js";
 import { open } from "fs/promises";
 import { pipeline } from "stream/promises";
 import { Readable, Writable } from "stream";

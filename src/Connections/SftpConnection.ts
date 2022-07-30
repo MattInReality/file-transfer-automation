@@ -1,4 +1,4 @@
-import { Connection, ConnectionOptions } from "./Connection";
+import { Connection, ConnectionOptions } from "./Connection.js";
 import Client from "ssh2-sftp-client";
 import { Readable, Writable } from "stream";
 

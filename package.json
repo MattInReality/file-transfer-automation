@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -12,6 +13,7 @@
   "dependencies": {
     "@types/node": "^18.0.0",
     "basic-ftp": "^4.6.6",
+    "bree": "^9.1.1",
     "ssh2-sftp-client": "^9.0.1"
   },
   "devDependencies": {
