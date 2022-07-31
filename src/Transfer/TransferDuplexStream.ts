@@ -6,7 +6,7 @@ export class TransferDuplexStream extends Duplex {
     super(options);
   }
 
-  _write(
+  override _write(
     chunk: any,
     encoding: BufferEncoding,
     callback: (error?: Error | null) => void
@@ -15,11 +15,11 @@ export class TransferDuplexStream extends Duplex {
     callback();
   }
 
-  _read(size: number) {
+  override _read(size: number) {
     super._read(size);
   }
 
-  _final(callback: (error?: Error | null) => void) {
+  override _final(callback: (error?: Error | null) => void) {
     this.push(null);
     callback();
   }

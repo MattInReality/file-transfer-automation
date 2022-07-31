@@ -8,8 +8,8 @@ import { TransferDuplexStream } from "./TransferDuplexStream.js";
 export interface TransferJob {
   sourceOptions: ConnectionFactoryOptions;
   remoteOptions: ConnectionFactoryOptions;
-  sourceFile: string;
-  destinationFile: string;
+  sourcePath: string;
+  destinationPath: string;
 }
 
 export class TransferBroker {
@@ -20,8 +20,8 @@ export class TransferBroker {
   private transferDuplex: TransferDuplexStream;
 
   constructor(private transferJob: TransferJob) {
-    this.sourceFile = transferJob.sourceFile;
-    this.destinationFile = transferJob.destinationFile;
+    this.sourceFile = transferJob.sourcePath;
+    this.destinationFile = transferJob.destinationPath;
     this.transferDuplex = new TransferDuplexStream();
     this.source = ConnectionFactory.create(this.transferJob.sourceOptions);
     this.remote = ConnectionFactory.create(this.transferJob.remoteOptions);

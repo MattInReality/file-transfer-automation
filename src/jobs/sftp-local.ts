@@ -1,7 +1,7 @@
 import { TransferBroker } from "../Transfer/TransferBroker.js";
 import { parentPort } from "worker_threads";
 import { connectionOptions } from "../jobs.temp.js";
-import { fileURLToPath } from "url";
+import { getPathRelativeToRoot } from "../helpers.js";
 
 (async () => {
   try {
@@ -14,10 +14,9 @@ import { fileURLToPath } from "url";
         connectionType: "LOCAL",
         connectionOptions: {},
       },
-      sourceFile: "stockfile/stockfile.csv",
-      destinationFile: fileURLToPath(
-        new URL("../../download/stockfile.csv", import.meta.url)
-      ),
+      sourcePath: "stockfile/stockfile.csv",
+      // TODO: this function ultimately exists to cover the non-existence of a database and path values being stored properly. Move the getPath in to the data query for database persistence.
+      destinationPath: getPathRelativeToRoot("download/stockFile.csv"),
     });
     await transferBroker.makeTransfer();
     if (parentPort)
