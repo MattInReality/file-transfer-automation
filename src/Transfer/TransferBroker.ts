@@ -6,6 +6,8 @@ import {
 import { TransferDuplexStream } from "./TransferDuplexStream.js";
 
 export interface TransferJob {
+  id: number;
+  name?: string;
   sourceOptions: ConnectionFactoryOptions;
   remoteOptions: ConnectionFactoryOptions;
   sourcePath: string;
@@ -17,7 +19,7 @@ export class TransferBroker {
   remote: Connection;
   sourceFile: string;
   destinationFile: string;
-  private transferDuplex: TransferDuplexStream;
+  transferDuplex: TransferDuplexStream;
 
   constructor(private transferJob: TransferJob) {
     this.sourceFile = transferJob.sourcePath;
