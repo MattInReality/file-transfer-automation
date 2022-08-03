@@ -28,3 +28,5 @@ export const appLogger = new Cabin({
     logger: env === "production" ? automationLogger : new Signale(),
   },
 });
+
+// TODO: When I add this to fastify I need to add appLogger to meet the interface requirements.

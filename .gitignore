@@ -192,4 +192,4 @@ dist
 # Compiled JS
 build
 download/*.csv
-jobs.temp.ts
+*.temp.ts
