@@ -2,8 +2,10 @@ import { Duplex } from "stream";
 import { DuplexOptions } from "stream";
 
 export class TransferDuplexStream extends Duplex {
+  private data: string;
   constructor(private options?: DuplexOptions) {
     super(options);
+    this.data = "";
   }
 
   override _write(
@@ -15,9 +17,7 @@ export class TransferDuplexStream extends Duplex {
     callback();
   }
 
-  override _read(size: number) {
-    super._read(size);
-  }
+  override _read(size: number) {}
 
   override _final(callback: (error?: Error | null) => void) {
     this.push(null);
