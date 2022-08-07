@@ -1,8 +1,21 @@
-import scheduler from "./Scheduling/scheduler.js";
+import { scheduler, initJobs, AppJob } from "./Scheduling/scheduler.js";
 
-await scheduler.add({
-  name: "transfer",
-  cron: "*/2 * * * *",
-  worker: { workerData: 1 },
+const jobs: AppJob[] = [
+  {
+    jobType: "transfer",
+    jobDataId: 1,
+    cron: "*/2 * * * *",
+  },
+  {
+    jobType: "transfer",
+    jobDataId: 2,
+    cron: "*/2 * * * *",
+    timeout: 30000,
+  },
+];
+
+await initJobs(jobs, scheduler);
+
+await scheduler.start().catch((err) => {
+  console.log(err.message);
 });
-await scheduler.start();
