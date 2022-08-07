@@ -16,4 +16,5 @@ export interface ConnectionOptions {
   username?: string;
   password?: string;
   secure?: boolean;
+  apiKey?: string;
 }
