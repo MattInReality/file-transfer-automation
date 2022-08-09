@@ -3,17 +3,9 @@ import { SHARE_ENV } from "worker_threads";
 import { fileURLToPath } from "url";
 import { appLogger } from "../logger.js";
 import { getPathRelativeToRoot } from "../helpers.js";
+import { jobs } from "../transferJobs.temp.js";
 
 const root = fileURLToPath(new URL("../jobs", import.meta.url).toString());
-
-//TODO: Read up on and add Graceful
-// https://github.com/forwardemail/forwardemail.net/blob/master/bree.js
-// https://github.com/ladjs/graceful
-export const scheduler = new Bree({
-  root,
-  worker: { env: SHARE_ENV },
-  logger: appLogger,
-});
 
 //Supposed to be a basic structure for job creation but arguably unnecessary.
 //TODO: Use this as guidance for Bree job creation for db storage.
@@ -39,10 +31,26 @@ const convertToBreeJob = (job: AppJob) => {
   };
 };
 
+//TODO: This when the db is attached this needs to query the db for the jobs.
+const getJobs = async (): Promise<AppJob[]> => {
+  return Promise.resolve(jobs);
+};
+
 //TODO: When we move to storing jobs in DB don't forget to change the types here and bin off the conversion.
-export const initJobs = async (jobs: AppJob[], scheduler: Bree) => {
+//TODO: Configuration should be done in the index file. The config object should be passed to this function and that means composing it.
+//TODO: Read up on and add Graceful to config object
+// https://github.com/forwardemail/forwardemail.net/blob/master/bree.js
+// https://github.com/ladjs/graceful
+export const initScheduler = async () => {
+  const scheduler = new Bree({
+    root,
+    worker: { env: SHARE_ENV },
+    logger: appLogger,
+  });
+  const jobs = await getJobs();
   if (jobs.length < 1) return;
   for (const job of jobs) {
     await scheduler.add(convertToBreeJob(job));
   }
+  return scheduler.start();
 };
