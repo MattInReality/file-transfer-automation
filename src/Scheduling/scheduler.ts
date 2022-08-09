@@ -41,6 +41,7 @@ const convertToBreeJob = (job: AppJob) => {
 
 //TODO: When we move to storing jobs in DB don't forget to change the types here and bin off the conversion.
 export const initJobs = async (jobs: AppJob[], scheduler: Bree) => {
+  if (jobs.length < 1) return;
   for (const job of jobs) {
     await scheduler.add(convertToBreeJob(job));
   }
