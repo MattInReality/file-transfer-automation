@@ -1,9 +1,14 @@
-import { Connection } from "./Connection.js";
+import { Connection, ConnectionOptions } from "./Connection.js";
 import { open } from "fs/promises";
 import { pipeline } from "stream/promises";
 import { Readable, Writable } from "stream";
+import path from "path";
 
 export class LocalFsConnection implements Connection {
+  private readonly baseUrl: string;
+  constructor(private readonly connectionOptions: ConnectionOptions) {
+    this.baseUrl = connectionOptions.host;
+  }
   _open() {
     return Promise.resolve();
   }
@@ -15,7 +20,7 @@ export class LocalFsConnection implements Connection {
   upload = async (localPath: Readable, to: string): Promise<void> => {
     let writeStream;
     try {
-      const file = await open(to, "w");
+      const file = await open(path.join(this.baseUrl, to), "w");
       writeStream = file.createWriteStream();
       await pipeline(localPath, writeStream);
       return;
@@ -30,7 +35,7 @@ export class LocalFsConnection implements Connection {
   download = async (remotePath: string, to: Writable): Promise<void> => {
     let readStream;
     try {
-      const file = await open(remotePath);
+      const file = await open(path.join(this.baseUrl, remotePath));
       readStream = file.createReadStream();
       await pipeline(readStream, to);
       return;

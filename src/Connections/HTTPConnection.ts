@@ -2,10 +2,10 @@ import { Connection, ConnectionOptions } from "./Connection.js";
 import fetch from "node-fetch";
 import { Readable, Writable } from "stream";
 import { pipeline } from "stream/promises";
-
+import path from "path";
 export class HTTPConnection implements Connection {
-  baseUrl: string | undefined;
-  constructor(connectionOptions: ConnectionOptions) {
+  private readonly baseUrl: string;
+  constructor(private readonly connectionOptions: ConnectionOptions) {
     this.baseUrl = connectionOptions.host;
   }
 
@@ -14,9 +14,8 @@ export class HTTPConnection implements Connection {
   _close() {}
 
   download = async (remotePath: string, to: Writable): Promise<void> => {
-    //TODO: Validate URL. Make sure slashes are checked and added where required.
     //TODO: expand upon the request to add authentication properties and headers
-    const response = await fetch(`${this.baseUrl}${remotePath}`);
+    const response = await fetch(path.join(this.baseUrl, remotePath));
     if (!response.ok || response.body === null) {
       throw new Error(`Error downloading from remote: ${remotePath}`);
     }

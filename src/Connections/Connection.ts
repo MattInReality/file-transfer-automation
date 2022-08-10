@@ -10,8 +10,9 @@ export abstract class Connection {
   abstract upload(localPath: Readable, to: string): Promise<void>;
 }
 
+// What is the use of host in Local? What about protecting the application/server
 export interface ConnectionOptions {
-  host?: string;
+  host: string;
   port?: number;
   username?: string;
   password?: string;

@@ -18,7 +18,7 @@ export class ConnectionFactory {
     } else if (connectionFactoryOptions.connectionType === "FTP") {
       return new FtpConnection(connectionFactoryOptions.connectionOptions);
     } else if (connectionFactoryOptions.connectionType === "LOCAL") {
-      return new LocalFsConnection();
+      return new LocalFsConnection(connectionFactoryOptions.connectionOptions);
     } else if (connectionFactoryOptions.connectionType === "HTTP") {
       return new HTTPConnection(connectionFactoryOptions.connectionOptions);
     } else throw new Error("connectionType not recognised");
