@@ -1,5 +1,5 @@
 import { initScheduler } from "./Scheduling/scheduler.js";
 
 await initScheduler().catch((e: any) => {
-  console.log(e.message);
+  console.error(e.message);
 });
