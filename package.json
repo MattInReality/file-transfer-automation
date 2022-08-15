@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node build/index.js"
+    "start": "node build/server.js"
   },
   "keywords": [],
   "author": "",
