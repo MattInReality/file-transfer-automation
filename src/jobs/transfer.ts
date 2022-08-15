@@ -16,8 +16,12 @@ import { getTransferJobById } from "../db/queries.js";
     if (parentPort) {
       parentPort.postMessage(message);
     } else process.exit(0);
-  } catch (e) {
-    console.error(e);
+  } catch (e: any) {
+    if (parentPort) {
+      parentPort.postMessage(e.message);
+    } else {
+      console.error(e);
+    }
     process.exit();
   }
 })();
