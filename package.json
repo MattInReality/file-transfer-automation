@@ -5,24 +5,26 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node build/server.js",
-    "dev": "nodemon build/server.js"
+    "start": "node build/src/server.js",
+    "dev": "nodemon build/src/server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@prisma/client": "^4.2.1",
     "@types/node": "^18.0.0",
     "@types/node-fetch": "^2.6.2",
     "basic-ftp": "^4.6.6",
     "bree": "^9.1.1",
     "cabin": "^9.1.2",
     "fastify": "^4.4.0",
-    "fastify-objectionjs": "^1.0.0",
+    "fastify-plugin": "^4.2.0",
     "node-fetch": "^3.2.10",
     "pg": "^8.7.3",
     "pino": "^8.3.1",
     "pino-pretty": "^8.1.0",
+    "prisma": "^4.2.1",
     "signale": "^1.4.0",
     "ssh2-sftp-client": "^9.0.1"
   },
@@ -31,6 +33,7 @@
     "@types/ssh2-sftp-client": "^7.0.1",
     "nodemon": "^2.0.19",
     "prettier": "2.7.1",
+    "ts-node": "^10.9.1",
     "typescript": "^4.7.4"
   }
 }

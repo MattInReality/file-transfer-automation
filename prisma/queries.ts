@@ -1,5 +1,5 @@
 import { jobDB } from "../transferJobs.temp.js";
-// jobDB is temporary. Real db implementation required
+// jobDB is temporary. Real prisma implementation required
 import { TransferJob } from "../Transfer/TransferBroker.js";
 
 export const getTransferJobById = (id: number): TransferJob | undefined => {

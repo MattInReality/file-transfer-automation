@@ -1,6 +1,6 @@
 import { parentPort, workerData } from "worker_threads";
 import { TransferBroker } from "../Transfer/TransferBroker.js";
-import { getTransferJobById } from "../db/queries.js";
+import { getTransferJobById } from "../../prisma/queries.js";
 
 (async () => {
   try {
