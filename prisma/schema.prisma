@@ -1,0 +1,67 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id          Int          @id @default(autoincrement())
+    firstName   String?
+    lastName    String?
+    email       String?
+    connections Connection[]
+}
+
+model Connection {
+    id                Int                @id @default(autoincrement())
+    name              String             @unique
+    host              String
+    username          String?
+    password          String?
+    apiKey            String?
+    secure            Boolean?
+    createdBy         User               @relation(fields: [createdById], references: [id])
+    createdById       Int
+    transferEndPoints TransferEndPoint[]
+    createdAt         DateTime           @default(now())
+    modifiedAt        DateTime           @default(now())
+}
+
+model TransferEndPoint {
+    id                  Int        @id @default(autoincrement())
+    connectionType      String
+    connectionOptions   Connection @relation(fields: [connectionOptionsId], references: [id])
+    connectionOptionsId Int
+    source              Transfer[] @relation("source")
+    remote              Transfer[] @relation("remote")
+    createdAt           DateTime   @default(now())
+    modifiedAt          DateTime   @default(now())
+}
+
+model Transfer {
+    id   Int    @id @default(autoincrement())
+    name String
+
+    sourceOptionsId Int
+    sourceOptions   TransferEndPoint @relation("source", fields: [sourceOptionsId], references: [id])
+
+    remoteOptionsId Int
+    remoteOptions   TransferEndPoint @relation("remote", fields: [remoteOptionsId], references: [id])
+
+    sourcePath String
+    remotePath String
+    createdAt  DateTime @default(now())
+    modifiedAt DateTime @default(now())
+}
+
+model Job {
+    id        Int    @id @default(autoincrement())
+    jobRunner String
+    jobDataId String
+    cron      String
+    timeout   Int?
+    interval  Int?
+}

@@ -8,9 +8,9 @@ import { jobs } from "../transferJobs.temp.js";
 const root = fileURLToPath(new URL("../jobs", import.meta.url).toString());
 
 //Supposed to be a basic structure for job creation but arguably unnecessary.
-//TODO: Use this as guidance for Bree job creation for db storage.
-export interface AppJob {
-  jobType: string;
+//TODO: Use this as guidance for Bree job creation for prisma storage.
+export interface Job {
+  jobRunner: string;
   jobDataId: number;
   cron: string;
   timeout?: number;
@@ -19,10 +19,10 @@ export interface AppJob {
 
 //A bree job isn't the same and so I need to create a Bree Job from my job. Particular focus on the path...
 //TODO: Is this a local data issue? Create the Bree job at input instead of parsing it.
-const convertToBreeJob = (job: AppJob) => {
+const convertToBreeJob = (job: Job) => {
   return {
-    name: `${job.jobType}-${job.jobDataId}`,
-    path: getPathRelativeToRoot(`/build/jobs/${job.jobType}.js`),
+    name: `${job.jobRunner}-${job.jobDataId}`,
+    path: getPathRelativeToRoot(`/build/jobs/${job.jobRunner}.js`),
     timeout: job.timeout ?? 0,
     cron: job.cron,
     worker: {
@@ -31,8 +31,8 @@ const convertToBreeJob = (job: AppJob) => {
   };
 };
 
-//TODO: This when the db is attached this needs to query the db for the jobs.
-const getJobs = async (): Promise<AppJob[]> => {
+//TODO: This when the prisma is attached this needs to query the prisma for the jobs.
+const getJobs = async (): Promise<Job[]> => {
   return Promise.resolve(jobs);
 };
 
