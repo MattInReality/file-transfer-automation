@@ -8,35 +8,26 @@ datasource db {
 }
 
 model User {
-    id          Int          @id @default(autoincrement())
-    firstName   String?
-    lastName    String?
-    email       String?
+    id        Int     @id @default(autoincrement())
+    firstName String?
+    lastName  String?
+    email     String?
 }
 
 model Connection {
-    id                Int                @id @default(autoincrement())
-    name              String             @unique
-    host              String
-    port              Int?
-    username          String?
-    password          String?
-    apiKey            String?
-    secure            Boolean?
-    transferEndPoints TransferEndPoint[]
-    createdAt         DateTime?           @default(now())
-    modifiedAt        DateTime?          @default(now())
-}
-
-model TransferEndPoint {
-    id                  Int        @id @default(autoincrement())
-    connectionType      String
-    connectionOptions   Connection @relation(fields: [connectionOptionsId], references: [id])
-    connectionOptionsId Int
-    source              Transfer[] @relation("source")
-    remote              Transfer[] @relation("remote")
-    createdAt           DateTime   @default(now())
-    modifiedAt          DateTime   @default(now())
+    id              Int            @id @default(autoincrement())
+    connectionType Strin
+    name            String         @unique
+    host            String
+    port            Int?
+    username        String?
+    password        String?
+    apiKey          String?
+    secure          Boolean?
+    transferSources Transfer[]     @relation("sourceOptions")
+    transferRemotes Transfer[]     @relation("remoteOptions")
+    createdAt       DateTime?      @default(now())
+    modifiedAt      DateTime?      @default(now())
 }
 
 model Transfer {
@@ -44,10 +35,10 @@ model Transfer {
     name String
 
     sourceOptionsId Int
-    sourceOptions   TransferEndPoint @relation("source", fields: [sourceOptionsId], references: [id])
+    sourceOptions   Connection @relation("sourceOptions", fields: [sourceOptionsId], references: [id])
 
     remoteOptionsId Int
-    remoteOptions   TransferEndPoint @relation("remote", fields: [remoteOptionsId], references: [id])
+    remoteOptions   Connection @relation("remoteOptions", fields: [remoteOptionsId], references: [id])
 
     sourcePath String
     remotePath String
@@ -56,11 +47,11 @@ model Transfer {
 }
 
 model Job {
-    id        Int    @id @default(autoincrement())
+    id        Int     @id @default(autoincrement())
     jobRunner String
     jobDataId String
     cron      String
     timeout   Int?
     interval  Int?
-    active Boolean @default(true)
+    active    Boolean @default(true)
 }
