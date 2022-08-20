@@ -1,7 +1,7 @@
-import { jobDB } from "../transferJobs.temp.js";
+import { jobDB } from "../src/transferJobs.temp";
 // jobDB is temporary. Real prisma implementation required
-import { TransferJob } from "../Transfer/TransferBroker.js";
+import { Transfer } from "../src/Transfer/TransferBroker.js";
 
-export const getTransferJobById = (id: number): TransferJob | undefined => {
-  return jobDB.find((j: TransferJob) => j.id === id);
+export const getTransferJobById = (id: number): Transfer | undefined => {
+  return jobDB.find((j: Transfer) => j.id === id);
 };

@@ -12,22 +12,20 @@ model User {
     firstName   String?
     lastName    String?
     email       String?
-    connections Connection[]
 }
 
 model Connection {
     id                Int                @id @default(autoincrement())
     name              String             @unique
     host              String
+    port              Int?
     username          String?
     password          String?
     apiKey            String?
     secure            Boolean?
-    createdBy         User               @relation(fields: [createdById], references: [id])
-    createdById       Int
     transferEndPoints TransferEndPoint[]
-    createdAt         DateTime           @default(now())
-    modifiedAt        DateTime           @default(now())
+    createdAt         DateTime?           @default(now())
+    modifiedAt        DateTime?          @default(now())
 }
 
 model TransferEndPoint {
@@ -64,4 +62,5 @@ model Job {
     cron      String
     timeout   Int?
     interval  Int?
+    active Boolean @default(true)
 }
