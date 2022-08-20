@@ -1,4 +1,4 @@
-import { jobDB } from "../src/transferJobs.temp";
+import { jobDB } from "../src/transferJobs.temp.js";
 // jobDB is temporary. Real prisma implementation required
 import { Transfer } from "../src/Transfer/TransferBroker.js";
 

@@ -5,15 +5,13 @@ import { Readable, Writable } from "stream";
 
 export class FtpConnection implements Connection {
   private client: Client;
-  private readonly connectionOptions: ConnectionOptions;
   private readonly user: string | undefined;
   private readonly password: string | undefined;
   private readonly secure: boolean | undefined;
   private readonly host: string | undefined;
 
-  constructor(connectionOptions: ConnectionOptions) {
+  constructor(private readonly connectionOptions: ConnectionOptions) {
     this.client = new ftp.Client();
-    this.connectionOptions = connectionOptions;
     this.user = connectionOptions.username;
     this.password = connectionOptions.password;
     this.host = connectionOptions.host;

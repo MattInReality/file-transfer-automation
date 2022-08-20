@@ -1,15 +1,12 @@
-import { Connection } from "../Connections/Connection.js";
-import {
-  ConnectionFactory,
-  ConnectionFactoryOptions,
-} from "../Connections/ConnectionFactory.js";
+import { Connection, ConnectionOptions } from "../Connections/Connection.js";
+import { ConnectionFactory } from "../Connections/ConnectionFactory.js";
 import { TransferDuplexStream } from "./TransferDuplexStream.js";
 
 export interface Transfer {
   id: number;
   name?: string;
-  sourceOptions: ConnectionFactoryOptions;
-  remoteOptions: ConnectionFactoryOptions;
+  sourceOptions: ConnectionOptions;
+  remoteOptions: ConnectionOptions;
   sourcePath: string;
   destinationPath: string;
 }

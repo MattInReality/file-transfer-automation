@@ -22,7 +22,7 @@ export interface Job {
 const convertToBreeJob = (job: Job) => {
   return {
     name: `${job.jobRunner}-${job.jobDataId}`,
-    path: getPathRelativeToRoot(`/build/jobs/${job.jobRunner}.js`),
+    path: getPathRelativeToRoot(`/src/jobs/${job.jobRunner}.js`),
     timeout: job.timeout ?? 0,
     cron: job.cron,
     worker: {

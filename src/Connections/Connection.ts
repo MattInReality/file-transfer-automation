@@ -12,6 +12,7 @@ export abstract class Connection {
 
 // What is the use of host in Local? What about protecting the application/server
 export interface ConnectionOptions {
+  connectionType: string;
   host: string;
   port?: number;
   username?: string;
