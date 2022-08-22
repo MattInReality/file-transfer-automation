@@ -9,8 +9,8 @@ const server = build({
   logger: true,
 });
 
-await initScheduler().catch((e: any) => {
-  console.error(e.message);
-});
+// await initScheduler().catch((e: any) => {
+//   console.error(e.message);
+// });
 
 await server.listen({ port: 3000 });

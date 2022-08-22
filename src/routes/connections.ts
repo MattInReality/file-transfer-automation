@@ -6,87 +6,168 @@ import {
 } from "fastify";
 import { Prisma } from "@prisma/client";
 
-type transferEndPointNestedCreateSchema = {
-  Body: {
-    transferEndPoint: {
-      connectionType: string;
-      connectionOptions: Prisma.ConnectionCreateWithoutTransferEndPointsInput;
-    };
-  };
-};
-
 export const connections = async function routes(
   fastify: FastifyInstance,
   opts: FastifyPluginOptions
 ) {
-  fastify.get("/", async (request, reply) => {
-    // Query for id and name of all connection
-    const connections = await fastify.prisma.connection.findMany();
-    return { message: "Hello from connections root", connections };
+  fastify.addSchema({
+    $id: "connection",
+    type: "object",
+    properties: {
+      connectionType: { type: "string" },
+      name: { type: "string" },
+      host: { type: "string" },
+      port: { type: "integer" },
+      username: { type: "string" },
+      password: { type: "string" },
+      apiKey: { type: "string" },
+      secure: { type: "boolean" },
+    },
+    required: ["name", "host", "connectionType"],
   });
-
-  fastify.post("/", {
+  fastify.get("/", {
     schema: {
-      body: {
-        type: "object",
-        properties: {
-          transferEndPoint: {
-            type: "object",
-            properties: {
-              connectionType: {
-                type: "string",
-              },
-              connectionOptions: {
-                type: "object",
-                properties: {
-                  name: { type: "string" },
-                  host: { type: "string" },
-                  port: { type: "integer" },
-                  username: { type: "string" },
-                  password: { type: "string" },
-                  apiKey: { type: "string" },
-                  secure: { type: "boolean" },
-                },
-                required: ["name", "host"],
-              },
+      response: {
+        200: {
+          description: "Get all connections",
+          type: "object",
+          properties: {
+            connections: {
+              type: "array",
             },
           },
         },
       },
     },
-    handler: async (
-      request: FastifyRequest<transferEndPointNestedCreateSchema>,
-      reply: FastifyReply
-    ) => {
-      const { connectionType, connectionOptions } =
-        request.body.transferEndPoint;
-      const transferEndPoint = await fastify.prisma.transferEndPoint.create({
-        data: {
-          connectionType,
-          connectionOptions: {
-            create: connectionOptions,
+    handler: async (request: FastifyRequest, reply: FastifyReply) => {
+      const connections = await fastify.prisma.connection.findMany({});
+      return { connections };
+    },
+  });
+
+  fastify.post("/", {
+    schema: {
+      response: {
+        201: {
+          description: "Create a new connection",
+          type: "object",
+          properties: {
+            connection: { $ref: "connection#" },
           },
         },
-        include: {
-          connectionOptions: true,
+      },
+      body: {
+        type: "object",
+        properties: {
+          connection: { $ref: "connection#" },
         },
+      },
+    },
+    handler: async (
+      request: FastifyRequest<{
+        Body: { connection: Prisma.ConnectionCreateInput };
+      }>,
+      reply: FastifyReply
+    ) => {
+      const { connection } = request.body;
+      const transferEndPoint = await fastify.prisma.connection.create({
+        data: connection,
       });
       return { message: "Connection Created", connection: transferEndPoint };
     },
   });
 
-  fastify.get("/:id", async (request, reply) => {
-    // Query to view a specific connection.
-    return { message: "Getting something from connections" };
+  fastify.get("/:id", {
+    schema: {
+      response: {
+        201: {
+          description: "Get a specific connection",
+          type: "object",
+          properties: {
+            connection: { $ref: "connection#" },
+          },
+        },
+      },
+      params: {
+        id: { type: "number" },
+      },
+    },
+
+    handler: async (
+      request: FastifyRequest<{ Params: { id: number } }>,
+      reply: FastifyReply
+    ) => {
+      // Query to view a specific connection.
+      const id = request.params.id;
+      return await fastify.prisma.connection.findUnique({
+        where: { id: id },
+      });
+    },
   });
 
-  fastify.put("/:id", async (request, reply) => {
-    // Query to update a specific connection
-    return { message: "Put in the connections" };
+  fastify.put("/:id", {
+    schema: {
+      response: {
+        204: {
+          description: "Updates a connection",
+          type: "object",
+          properties: {
+            connection: { $ref: "connection#" },
+          },
+        },
+      },
+      params: {
+        id: { type: "number" },
+      },
+      body: {
+        connection: { $ref: "connection#" },
+      },
+    },
+    handler: async (
+      request: FastifyRequest<{
+        Params: { id: number };
+        Body: { connection: Prisma.ConnectionUpdateInput };
+      }>,
+      reply: FastifyReply
+    ) => {
+      const connection = fastify.prisma.connection.update({
+        where: {
+          id: request.params.id,
+        },
+        data: request.body.connection,
+      });
+      return { connection };
+    },
   });
 
-  fastify.delete("/:id", async (request, reply) => {
-    // Query to delete a connection - should not delete if used in a job
-    return { message: "Deleted from connections" };
+  fastify.delete("/:id", {
+    schema: {
+      response: {
+        200: {
+          description: "Delete a connection",
+          type: "object",
+          properties: {
+            message: {
+              type: "string",
+            },
+          },
+        },
+      },
+      params: {
+        id: { type: "number" },
+      },
+    },
+
+    handler: async (
+      request: FastifyRequest<{ Params: { id: number } }>,
+      reply: FastifyReply
+    ) => {
+      // Query to view a specific connection.
+      const id = request.params.id;
+      await fastify.prisma.connection.delete({
+        where: { id: id },
+      });
+      return { message: "Connection Deleted" };
+    },
   });
 };
