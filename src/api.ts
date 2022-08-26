@@ -3,8 +3,12 @@ import Fastify, {
   FastifyReply,
   FastifyRequest,
 } from "fastify";
-import { connections } from "./routes/connections.js";
+
+//Plugins
 import prismaPlugin from "./plugins/prisma.js";
+
+//Routes
+import { routes } from "./routes/index.routes.js";
 
 const build = function (opts = {}) {
   const app: FastifyInstance = Fastify(opts);
@@ -15,7 +19,7 @@ const build = function (opts = {}) {
     return { message: "Hello World" };
   });
 
-  app.register(connections, { prefix: "/connections" });
+  app.register(routes, { prefix: "/api" });
 
   return app;
 };
