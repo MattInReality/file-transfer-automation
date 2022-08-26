@@ -4,9 +4,9 @@ import {
   FastifyReply,
   FastifyRequest,
 } from "fastify";
-import { Prisma } from "@prisma/client";
+import { Connection, Prisma } from "@prisma/client";
 
-export const connections = async function routes(
+export const connectionRoutes = async function routes(
   fastify: FastifyInstance,
   opts: FastifyPluginOptions
 ) {
@@ -30,18 +30,15 @@ export const connections = async function routes(
       response: {
         200: {
           description: "Get all connections",
-          type: "object",
-          properties: {
-            connections: {
-              type: "array",
-            },
+          type: "array",
+          items: {
+            $ref: "connection#",
           },
         },
       },
     },
     handler: async (request: FastifyRequest, reply: FastifyReply) => {
-      const connections = await fastify.prisma.connection.findMany({});
-      return { connections };
+      return await fastify.prisma.connection.findMany({});
     },
   });
 
@@ -51,29 +48,24 @@ export const connections = async function routes(
         201: {
           description: "Create a new connection",
           type: "object",
-          properties: {
-            connection: { $ref: "connection#" },
-          },
+          $ref: "connection#",
         },
       },
       body: {
-        type: "object",
-        properties: {
-          connection: { $ref: "connection#" },
-        },
+        $ref: "connection#",
       },
     },
     handler: async (
       request: FastifyRequest<{
-        Body: { connection: Prisma.ConnectionCreateInput };
+        Body: Connection;
       }>,
       reply: FastifyReply
     ) => {
-      const { connection } = request.body;
-      const transferEndPoint = await fastify.prisma.connection.create({
-        data: connection,
+      const data: Prisma.ConnectionCreateInput = request.body;
+
+      return await fastify.prisma.connection.create({
+        data,
       });
-      return { message: "Connection Created", connection: transferEndPoint };
     },
   });
 
@@ -83,9 +75,7 @@ export const connections = async function routes(
         201: {
           description: "Get a specific connection",
           type: "object",
-          properties: {
-            connection: { $ref: "connection#" },
-          },
+          $ref: "connection#",
         },
       },
       params: {
@@ -111,32 +101,31 @@ export const connections = async function routes(
         204: {
           description: "Updates a connection",
           type: "object",
-          properties: {
-            connection: { $ref: "connection#" },
-          },
+          $ref: "connection#",
         },
       },
       params: {
         id: { type: "number" },
       },
       body: {
-        connection: { $ref: "connection#" },
+        $ref: "connection#",
       },
     },
     handler: async (
       request: FastifyRequest<{
         Params: { id: number };
-        Body: { connection: Prisma.ConnectionUpdateInput };
+        Body: Connection;
       }>,
       reply: FastifyReply
     ) => {
-      const connection = fastify.prisma.connection.update({
+      let data: Prisma.ConnectionUpdateInput = request.body;
+
+      return await fastify.prisma.connection.update({
+        data,
         where: {
           id: request.params.id,
         },
-        data: request.body.connection,
       });
-      return { connection };
     },
   });
 
@@ -146,11 +135,6 @@ export const connections = async function routes(
         200: {
           description: "Delete a connection",
           type: "object",
-          properties: {
-            message: {
-              type: "string",
-            },
-          },
         },
       },
       params: {
@@ -167,7 +151,7 @@ export const connections = async function routes(
       await fastify.prisma.connection.delete({
         where: { id: id },
       });
-      return { message: "Connection Deleted" };
+      return {};
     },
   });
 };
