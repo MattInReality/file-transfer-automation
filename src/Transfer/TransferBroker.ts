@@ -8,7 +8,7 @@ export interface Transfer {
   sourceOptions: ConnectionOptions;
   remoteOptions: ConnectionOptions;
   sourcePath: string;
-  destinationPath: string;
+  remotePath: string;
 }
 
 export class TransferBroker {
@@ -20,7 +20,7 @@ export class TransferBroker {
 
   constructor(private transferJob: Transfer) {
     this.sourceFile = transferJob.sourcePath;
-    this.destinationFile = transferJob.destinationPath;
+    this.destinationFile = transferJob.remotePath;
     this.transferDuplex = new TransferDuplexStream();
     this.source = ConnectionFactory.create(this.transferJob.sourceOptions);
     this.remote = ConnectionFactory.create(this.transferJob.remoteOptions);
