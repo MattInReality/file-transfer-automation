@@ -8,12 +8,13 @@ import { Connection, Prisma } from "@prisma/client";
 
 export const connectionRoutes = async function routes(
   fastify: FastifyInstance,
-  opts: FastifyPluginOptions
+  _opts: FastifyPluginOptions
 ) {
   fastify.addSchema({
     $id: "connection",
     type: "object",
     properties: {
+      id: { type: "number" },
       connectionType: { type: "string" },
       name: { type: "string" },
       host: { type: "string" },
@@ -22,6 +23,8 @@ export const connectionRoutes = async function routes(
       password: { type: "string" },
       apiKey: { type: "string" },
       secure: { type: "boolean" },
+      createdAt: { type: "string" },
+      updatedAt: { type: "string" },
     },
     required: ["name", "host", "connectionType"],
   });
@@ -37,7 +40,7 @@ export const connectionRoutes = async function routes(
         },
       },
     },
-    handler: async (request: FastifyRequest, reply: FastifyReply) => {
+    handler: async (_request: FastifyRequest, _reply: FastifyReply) => {
       return await fastify.prisma.connection.findMany({});
     },
   });
@@ -59,7 +62,7 @@ export const connectionRoutes = async function routes(
       request: FastifyRequest<{
         Body: Connection;
       }>,
-      reply: FastifyReply
+      _reply: FastifyReply
     ) => {
       const data: Prisma.ConnectionCreateInput = request.body;
 
@@ -85,9 +88,8 @@ export const connectionRoutes = async function routes(
 
     handler: async (
       request: FastifyRequest<{ Params: { id: number } }>,
-      reply: FastifyReply
+      _reply: FastifyReply
     ) => {
-      // Query to view a specific connection.
       const id = request.params.id;
       return await fastify.prisma.connection.findUnique({
         where: { id: id },
@@ -116,7 +118,7 @@ export const connectionRoutes = async function routes(
         Params: { id: number };
         Body: Connection;
       }>,
-      reply: FastifyReply
+      _reply: FastifyReply
     ) => {
       let data: Prisma.ConnectionUpdateInput = request.body;
 
@@ -144,9 +146,8 @@ export const connectionRoutes = async function routes(
 
     handler: async (
       request: FastifyRequest<{ Params: { id: number } }>,
-      reply: FastifyReply
+      _reply: FastifyReply
     ) => {
-      // Query to view a specific connection.
       const id = request.params.id;
       await fastify.prisma.connection.delete({
         where: { id: id },
