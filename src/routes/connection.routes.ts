@@ -5,6 +5,7 @@ import {
   FastifyRequest,
 } from "fastify";
 import { Connection, Prisma } from "@prisma/client";
+import { getPathRelativeToRoot } from "../helpers.js";
 
 export const connectionRoutes = async function routes(
   fastify: FastifyInstance,
@@ -65,7 +66,10 @@ export const connectionRoutes = async function routes(
       _reply: FastifyReply
     ) => {
       const data: Prisma.ConnectionCreateInput = request.body;
-
+      //TODO: Find a better place for this logic.
+      if (data.connectionType.toLowerCase() === "local") {
+        data.host = getPathRelativeToRoot("../downloads");
+      }
       return await fastify.prisma.connection.create({
         data,
       });
