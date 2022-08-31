@@ -15,9 +15,9 @@ export interface ConnectionOptions {
   connectionType: string;
   name: string;
   host: string;
-  port?: number;
-  username?: string;
-  password?: string;
-  secure?: boolean;
-  apiKey?: string;
+  port?: number | null;
+  username?: string | null;
+  password?: string | null;
+  secure?: boolean | null;
+  apiKey?: string | null;
 }
