@@ -1,11 +1,23 @@
 import { parentPort, workerData } from "worker_threads";
 import { TransferBroker } from "../Transfer/TransferBroker.js";
-import { getTransferJobById } from "../../prisma/queries.js";
+import { PrismaClient } from "@prisma/client";
 
 (async () => {
+  let prisma;
   try {
     let message: string;
-    const transferData = getTransferJobById(workerData.job.worker.workerData);
+    prisma = new PrismaClient();
+    await prisma.$connect();
+
+    const transferData = await prisma.transfer.findUnique({
+      where: {
+        id: workerData.job.worker.workerData,
+      },
+      include: {
+        sourceOptions: true,
+        remoteOptions: true,
+      },
+    });
     if (!transferData) {
       message = "Transfer Data not found";
     } else {
@@ -23,5 +35,9 @@ import { getTransferJobById } from "../../prisma/queries.js";
       console.error(e);
     }
     process.exit();
+  } finally {
+    if (prisma) {
+      await prisma.$disconnect();
+    }
   }
 })();
