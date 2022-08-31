@@ -67,8 +67,8 @@ export const connectionRoutes = async function routes(
     ) => {
       const data: Prisma.ConnectionCreateInput = request.body;
       //TODO: Find a better place for this logic.
-      if (data.connectionType.toLowerCase() === "local") {
-        data.host = getPathRelativeToRoot("../downloads");
+      if (request.body.connectionType.toLowerCase() === "local") {
+        data.host = getPathRelativeToRoot("../download");
       }
       return await fastify.prisma.connection.create({
         data,
@@ -124,8 +124,10 @@ export const connectionRoutes = async function routes(
       }>,
       _reply: FastifyReply
     ) => {
-      let data: Prisma.ConnectionUpdateInput = request.body;
-
+      const data: Prisma.ConnectionUpdateInput = request.body;
+      if (request.body.connectionType.toLowerCase() === "local") {
+        data.host = getPathRelativeToRoot("../download");
+      }
       return await fastify.prisma.connection.update({
         data,
         where: {
