@@ -1,12 +1,13 @@
-import { parentPort, workerData } from "worker_threads";
-import { TransferBroker } from "../Transfer/TransferBroker.js";
+import { workerData } from "worker_threads";
 import { PrismaClient } from "@prisma/client";
+import { TransferBroker } from "../Transfer/TransferBroker.js";
+import { jobWorkerMessageReceiver } from "../helpers.js";
 
 (async () => {
-  let prisma;
+  const prisma = new PrismaClient();
+
   try {
-    let message: string;
-    prisma = new PrismaClient();
+    // I want the job done as quickly as possible so I'm not going to wait for lazy connection.
     await prisma.$connect();
 
     const transferData = await prisma.transfer.findUnique({
@@ -18,26 +19,19 @@ import { PrismaClient } from "@prisma/client";
         remoteOptions: true,
       },
     });
+
     if (!transferData) {
-      message = "Transfer Data not found";
-    } else {
-      const transferBroker = new TransferBroker(transferData);
-      await transferBroker.makeTransfer();
-      message = `Transfer Complete at ${new Date().toLocaleTimeString()}`;
+      return jobWorkerMessageReceiver("Transfer Data not found");
     }
-    if (parentPort) {
-      parentPort.postMessage(message);
-    } else process.exit(0);
+
+    const transferBroker = new TransferBroker(transferData);
+    await prisma.$disconnect();
+    await transferBroker.makeTransfer();
+    jobWorkerMessageReceiver(
+      `Transfer Complete at ${new Date().toLocaleTimeString()}`
+    );
   } catch (e: any) {
-    if (parentPort) {
-      parentPort.postMessage(e.message);
-    } else {
-      console.error(e);
-    }
-    process.exit();
-  } finally {
-    if (prisma) {
-      await prisma.$disconnect();
-    }
+    await prisma.$disconnect();
+    jobWorkerMessageReceiver(e.message, true);
   }
 })();
