@@ -12,7 +12,7 @@ export class HTTPConnection implements Connection {
 
   constructor(private readonly connectionOptions: ConnectionOptions) {
     this.baseUrl = connectionOptions.host;
-    this.apiKey = connectionOptions.apiKey;
+    this.apiKey = connectionOptions.apiKey ?? undefined;
   }
 
   _open() {}

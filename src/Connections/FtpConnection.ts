@@ -12,10 +12,10 @@ export class FtpConnection implements Connection {
 
   constructor(private readonly connectionOptions: ConnectionOptions) {
     this.client = new ftp.Client();
-    this.user = connectionOptions.username;
-    this.password = connectionOptions.password;
+    this.user = connectionOptions.username ?? "";
+    this.password = connectionOptions.password ?? "";
     this.host = connectionOptions.host;
-    this.secure = connectionOptions.secure;
+    this.secure = connectionOptions.secure ?? undefined;
     // this.client.ftp.verbose = true;
   }
 

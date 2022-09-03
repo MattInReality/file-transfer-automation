@@ -13,8 +13,8 @@ export class SftpConnection implements Connection {
   constructor(private readonly connectionOptions: ConnectionOptions) {
     this.client = new Client();
     this.host = connectionOptions.host;
-    this.username = connectionOptions.username;
-    this.password = connectionOptions.password;
+    this.username = connectionOptions.username ?? "";
+    this.password = connectionOptions.password ?? "";
     this.port = connectionOptions.port ?? 22;
   }
 
