@@ -7,12 +7,13 @@ import { jobWorkerMessageReceiver } from "../helpers.js";
   const prisma = new PrismaClient();
 
   try {
+    const { jobId, jobDataId } = workerData.job.worker.workerData;
     // I want the job done as quickly as possible so I'm not going to wait for lazy connection.
     await prisma.$connect();
 
     const transferData = await prisma.transfer.findUnique({
       where: {
-        id: workerData.job.worker.workerData,
+        id: jobDataId,
       },
       include: {
         sourceOptions: true,
@@ -28,7 +29,7 @@ import { jobWorkerMessageReceiver } from "../helpers.js";
     await prisma.$disconnect();
     await transferBroker.makeTransfer();
     jobWorkerMessageReceiver(
-      `Transfer Complete at ${new Date().toLocaleTimeString()}`
+      `Transfer ${jobId} Complete at ${new Date().toLocaleTimeString()}`
     );
   } catch (e: any) {
     await prisma.$disconnect();

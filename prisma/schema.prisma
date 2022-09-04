@@ -18,7 +18,7 @@ model User {
 
 model Connection {
     id              Int            @id @default(autoincrement())
-    connectionType String
+    connectionType  String
     name            String         @unique
     host            String
     port            Int?
@@ -29,12 +29,12 @@ model Connection {
     transferSources Transfer[]     @relation("sourceOptions")
     transferRemotes Transfer[]     @relation("remoteOptions")
     createdAt       DateTime      @default(now())
-    updatedAt      DateTime      @default(now()) @updatedAt
+    updatedAt       DateTime      @default(now()) @updatedAt
 }
 
 model Transfer {
-    id   Int    @id @default(autoincrement())
-    name String
+    id              Int    @id @default(autoincrement())
+    name            String
 
     sourceOptionsId Int
     sourceOptions   Connection @relation("sourceOptions", fields: [sourceOptionsId], references: [id])
@@ -42,20 +42,25 @@ model Transfer {
     remoteOptionsId Int
     remoteOptions   Connection @relation("remoteOptions", fields: [remoteOptionsId], references: [id])
 
-    sourcePath String
-    remotePath String
-    createdAt  DateTime @default(now())
-    updatedAt DateTime @default(now()) @updatedAt
+    sourcePath      String
+    remotePath      String
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime @default(now()) @updatedAt
 }
 
 model Job {
-    id        Int     @id @default(autoincrement())
-    jobRunner String
-    jobDataId String
-    cron      String
-    timeout   Int?
-    interval  Int?
-    active    Boolean @default(true)
-    createdAt DateTime @default(now())
-    updatedAt DateTime @default(now()) @updatedAt
+    id                      Int     @id @default(autoincrement())
+    name                    String
+    jobRunner               String
+    jobDataId               String
+    cron                    String
+    timeout                 Int?
+    interval                Int?
+    active                  Boolean @default(true)
+    createdAt               DateTime @default(now())
+    updatedAt               DateTime @default(now()) @updatedAt
+    lastRanAt               DateTime?
+    lastFailedAt            DateTime?
+    lastFailErrorMessage    String?
+
 }
