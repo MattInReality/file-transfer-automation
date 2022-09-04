@@ -2,7 +2,7 @@
   "name": "orn-file-transfer",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "build/server.js",
   "type": "module",
   "scripts": {
     "start": "node build/src/server.js",
