@@ -48,13 +48,13 @@ model Transfer {
     updatedAt       DateTime @default(now()) @updatedAt
 }
 
-model Job {
+model JobParams {
     id                      Int     @id @default(autoincrement())
     name                    String
     jobRunner               String
-    jobDataId               String
-    cron                    String
-    timeout                 Int?
+    jobDataId               Int
+    cron                    String?
+    timeout                 Int? @default(0)
     interval                Int?
     active                  Boolean @default(true)
     createdAt               DateTime @default(now())
