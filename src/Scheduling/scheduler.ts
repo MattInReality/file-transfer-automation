@@ -1,14 +1,14 @@
+import path from "path";
 import Bree from "bree";
 import { SHARE_ENV } from "worker_threads";
-import { fileURLToPath } from "url";
 import { appLogger } from "../logger.js";
 import { jobs } from "../transferJobs.temp.js";
 import { Job, RequiredJobParams } from "./Job.js";
 
-const root = fileURLToPath(new URL("../jobs", import.meta.url).toString());
+const root = path.resolve(__dirname, "../jobs");
 
 //TODO: This when the prisma is attached this needs to query the prisma for the jobs.
-const getJobs = async (): Promise<RequiredJobParams[]> => {
+export const getJobs = async (): Promise<RequiredJobParams[]> => {
   return Promise.resolve(jobs);
 };
 
@@ -17,7 +17,6 @@ const scheduler = new Bree({
   worker: { env: SHARE_ENV },
   logger: appLogger,
 });
-
 //TODO: Configuration should be done in the index file. The config object should be passed to this function and that means composing it.
 //TODO: Read up on and add Graceful to config object
 // https://github.com/forwardemail/forwardemail.net/blob/master/bree.js
