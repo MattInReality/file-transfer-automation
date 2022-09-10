@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "build/server.js",
-  "type": "module",
+  "type": "commonjs",
   "scripts": {
     "start": "node build/src/server.js",
     "dev": "nodemon build/src/server.js"
@@ -20,8 +20,9 @@
     "cabin": "^9.1.2",
     "cron-validate": "^1.4.3",
     "fastify": "^4.4.0",
+    "fastify-bree": "^3.0.1",
     "fastify-plugin": "^4.2.0",
-    "node-fetch": "^3.2.10",
+    "node-fetch": "^2.6.7",
     "pg": "^8.7.3",
     "pino": "^8.3.1",
     "pino-pretty": "^8.1.0",
