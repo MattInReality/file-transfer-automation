@@ -1,5 +1,4 @@
-import { initScheduler } from "./Scheduling/scheduler.js";
-import build from "./api.js";
+import build from "./api";
 
 process.on("unhandledRejection", (error) => {
   console.error(error);
@@ -9,8 +8,6 @@ const server = build({
   logger: true,
 });
 
-await initScheduler().catch((e: any) => {
-  console.error(e.message);
+server.listen({ port: 3000 }).then(() => {
+  console.log("Server Running on Port 3000");
 });
-
-await server.listen({ port: 3000 });
