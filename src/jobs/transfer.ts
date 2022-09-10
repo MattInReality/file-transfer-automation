@@ -1,7 +1,7 @@
 import { workerData } from "worker_threads";
 import { PrismaClient } from "@prisma/client";
-import { TransferBroker } from "../Transfer/TransferBroker.js";
-import { jobWorkerMessageReceiver } from "../helpers.js";
+import { TransferBroker } from "../Transfer/TransferBroker";
+import { jobWorkerMessageReceiver } from "../helpers";
 
 (async () => {
   const prisma = new PrismaClient();

@@ -1,8 +1,8 @@
-import { Connection, ConnectionOptions } from "./Connection.js";
-import { SftpConnection } from "./SftpConnection.js";
-import { FtpConnection } from "./FtpConnection.js";
-import { LocalFsConnection } from "./LocalFsConnection.js";
-import { HTTPConnection } from "./HTTPConnection.js";
+import { Connection, ConnectionOptions } from "./Connection";
+import { SftpConnection } from "./SftpConnection";
+import { FtpConnection } from "./FtpConnection";
+import { LocalFsConnection } from "./LocalFsConnection";
+import { HTTPConnection } from "./HTTPConnection";
 
 export class ConnectionFactory {
   static create = (connectionOptions: ConnectionOptions): Connection => {

@@ -12,9 +12,9 @@ import FastifyBree from "fastify-bree";
 
 //Routes
 import { routes } from "./routes/index.routes";
-import { appLogger } from "./logger.js";
-import { Job } from "./Scheduling/Job.js";
-import { getJobs } from "./Scheduling/scheduler.js";
+import { appLogger } from "./logger";
+import { Job } from "./Scheduling/Job";
+import { getJobs } from "./Scheduling/scheduler";
 
 const root = path.resolve(__dirname, "./jobs");
 
@@ -46,7 +46,7 @@ const build = function (opts = {}) {
     return await app.bree.start();
   });
 
-  app.get("/", async (request: FastifyRequest, reply: FastifyReply) => {
+  app.get("/", async (_request: FastifyRequest, _reply: FastifyReply) => {
     return { message: "Hello World" };
   });
 

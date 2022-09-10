@@ -1,11 +1,11 @@
 import { FastifyInstance, FastifyPluginOptions } from "fastify";
-import { connectionRoutes } from "./connection.routes.js";
-import { transferRoutes } from "./transfer.routes.js";
-import { jobRoutes } from "./jobs.routes.js";
+import { connectionRoutes } from "./connection.routes";
+import { transferRoutes } from "./transfer.routes";
+import { jobRoutes } from "./jobs.routes";
 
 export const routes = async function (
   fastify: FastifyInstance,
-  opts: FastifyPluginOptions
+  _opts: FastifyPluginOptions
 ) {
   fastify.register(connectionRoutes, { prefix: "/connections" });
   fastify.register(transferRoutes, { prefix: "/transfers" });

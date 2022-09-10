@@ -1,9 +1,9 @@
 import path from "path";
 import Bree from "bree";
 import { SHARE_ENV } from "worker_threads";
-import { appLogger } from "../logger.js";
-import { jobs } from "../transferJobs.temp.js";
-import { Job, RequiredJobParams } from "./Job.js";
+import { appLogger } from "../logger";
+import { jobs } from "../transferJobs.temp";
+import { Job, RequiredJobParams } from "./Job";
 
 const root = path.resolve(__dirname, "../jobs");
 

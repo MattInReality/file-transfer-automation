@@ -1,6 +1,6 @@
-import { Connection, ConnectionOptions } from "../Connections/Connection.js";
-import { ConnectionFactory } from "../Connections/ConnectionFactory.js";
-import { TransferDuplexStream } from "./TransferDuplexStream.js";
+import { Connection, ConnectionOptions } from "../Connections/Connection";
+import { ConnectionFactory } from "../Connections/ConnectionFactory";
+import { TransferDuplexStream } from "./TransferDuplexStream";
 
 export interface Transfer {
   id: number;

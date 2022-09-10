@@ -5,7 +5,7 @@ import {
   FastifyRequest,
 } from "fastify";
 import { Connection, Prisma } from "@prisma/client";
-import { getPathRelativeToRoot } from "../helpers.js";
+import { getPathRelativeToRoot } from "../helpers";
 
 export const connectionRoutes = async function routes(
   fastify: FastifyInstance,

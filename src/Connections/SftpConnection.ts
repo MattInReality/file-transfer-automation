@@ -1,4 +1,4 @@
-import { Connection, ConnectionOptions } from "./Connection.js";
+import { Connection, ConnectionOptions } from "./Connection";
 import Client from "ssh2-sftp-client";
 import { Readable, Writable } from "stream";
 
@@ -6,7 +6,6 @@ export class SftpConnection implements Connection {
   private client: Client;
   private readonly username: string | undefined;
   private readonly password: string | undefined;
-  private readonly secure: boolean | undefined;
   private readonly host: string | undefined;
   private readonly port: number | undefined;
 

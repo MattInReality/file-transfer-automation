@@ -1,4 +1,4 @@
-import { Connection, ConnectionOptions } from "./Connection.js";
+import { Connection, ConnectionOptions } from "./Connection";
 import fetch, { Headers, RequestInit } from "node-fetch";
 import { Readable, Writable } from "stream";
 import { pipeline } from "stream/promises";
