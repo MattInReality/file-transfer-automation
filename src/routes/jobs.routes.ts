@@ -33,15 +33,113 @@ export const jobRoutes = async function (
     required: ["name", "jobRunner", "jobDataId"],
   });
   fastify.get("/", {
-    schema: {},
-    handler: async (request: FastifyRequest, _reply: FastifyReply) => {
-      return { message: "Hello from GET" };
+    schema: {
+      response: {
+        200: {
+          description: "Returns a list of jobs",
+          type: "array",
+          items: {
+            description: "Partial job data",
+            type: "object",
+            properties: {
+              id: {
+                type: "integer",
+              },
+              name: {
+                type: "string",
+              },
+              lastRanAt: {
+                type: "string",
+              },
+              lastFailedAt: {
+                type: "string",
+              },
+              lastFailErrorMessage: {
+                type: "string",
+              },
+            },
+          },
+        },
+      },
+      querystring: {
+        active: {
+          type: "boolean",
+        },
+        search: {
+          type: "string",
+        },
+      },
+    },
+    handler: async (
+      request: FastifyRequest<{
+        Querystring: { active: boolean; search: string };
+      }>,
+      _reply: FastifyReply
+    ) => {
+      // Going to use the JSON shchema to control what data is returned. Even prisma says limiting horizontal data in the query doesn't save on performance unless the entity is huge.
+      let query: Prisma.JobParamsFindManyArgs = {};
+
+      // Allow for checking running jobs.
+      if (request.query.active) {
+        query.where = Object.assign(
+          { ...query.where },
+          {
+            active: request.query.active,
+          }
+        );
+      }
+      // Searching jobs by name. Will likely only be useful much later on when there are lots of jobs running.
+      if (request.query.search && request.query.search.length > 0) {
+        query.where = Object.assign(
+          { ...query.where },
+          {
+            name: {
+              search: request.query.search,
+            },
+          }
+        );
+      }
+
+      return fastify.prisma.jobParams.findMany(query);
     },
   });
   fastify.post("/", {
     schema: {
+      response: {
+        201: {
+          description:
+            "Successful insertion of job to the database and conditional job start",
+          type: "object",
+          properties: {
+            id: { type: "string" },
+            name: { type: "string" },
+            jobRunner: { type: "string" },
+            jobDataId: { type: "integer" },
+            cron: { type: "string" },
+            timeout: { type: "integer" },
+            interval: { type: "integer" },
+            active: { type: "boolean" },
+          },
+        },
+      },
       body: {
-        $ref: "job#",
+        description: "User defined fields for a job",
+        type: "object",
+        properties: {
+          name: { type: "string" },
+          jobRunner: { type: "string" },
+          jobDataId: { type: "integer" },
+          cron: { type: "string" },
+          timeout: { type: "integer" },
+          interval: { type: "integer" },
+          active: { type: "boolean" },
+        },
+        required: ["name", "jobRunner", "jobDataId", "active"],
+        anyOf: [
+          { required: ["cron"] },
+          { required: ["timeout"] },
+          { required: ["interval"] },
+        ],
       },
     },
     handler: async (
