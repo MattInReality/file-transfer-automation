@@ -10,7 +10,7 @@ export type RequiredJobParams = Required<
 export class Job {
   constructor(public jobParams: RequiredJobParams) {}
 
-  breeOptions = (): JobOptions => {
+  get breeOptions(): JobOptions {
     return {
       name: this.jobParams.name || "",
       //TODO: How can I add an error check for file existence on a worker.
@@ -27,5 +27,5 @@ export class Job {
         },
       },
     };
-  };
+  }
 }
