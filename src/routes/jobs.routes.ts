@@ -6,10 +6,11 @@ import {
 } from "fastify";
 import cronValidate from "cron-validate";
 import { JobParams, Prisma } from "@prisma/client";
+import { Job } from "../Scheduling/Job";
 
 export const jobRoutes = async function (
   fastify: FastifyInstance,
-  opts: FastifyPluginOptions
+  _opts: FastifyPluginOptions
 ) {
   fastify.addSchema({
     $id: "job",
@@ -18,7 +19,7 @@ export const jobRoutes = async function (
       id: { type: "integer" },
       name: { type: "string" },
       jobRunner: { type: "string" },
-      jobDataId: { type: "string" },
+      jobDataId: { type: "integer" },
       cron: { type: "string" },
       timeout: { type: "integer" },
       interval: { type: "integer" },
@@ -29,11 +30,11 @@ export const jobRoutes = async function (
       lastFailedAt: { type: "string" },
       lastFailErrorMessage: { type: "string" },
     },
-    required: ["name"],
+    required: ["name", "jobRunner", "jobDataId"],
   });
   fastify.get("/", {
     schema: {},
-    handler: async (request: FastifyRequest, reply: FastifyReply) => {
+    handler: async (request: FastifyRequest, _reply: FastifyReply) => {
       return { message: "Hello from GET" };
     },
   });
@@ -78,7 +79,15 @@ export const jobRoutes = async function (
       const created = await fastify.prisma.jobParams.create({
         data,
       });
-      return { message: "Hello from POST" };
+
+      if (created.active) {
+        const job = new Job(created);
+        await fastify.bree.add(job.breeOptions);
+        await fastify.bree.start(job.breeOptions.name);
+        return { message: `${created.name} started` };
+      }
+
+      return { message: `${created.name} added to the database` };
     },
   });
   fastify.get("/:id", {

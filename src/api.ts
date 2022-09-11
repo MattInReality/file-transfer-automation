@@ -14,7 +14,6 @@ import FastifyBree from "fastify-bree";
 import { routes } from "./routes/index.routes";
 import { appLogger } from "./logger";
 import { Job } from "./Scheduling/Job";
-import { getJobs } from "./Scheduling/scheduler";
 
 const root = path.resolve(__dirname, "./jobs");
 
@@ -33,17 +32,24 @@ const build = function (opts = {}) {
   });
 
   app.addHook("onReady", async function () {
-    const jobs = await getJobs();
+    const jobs = await app.prisma.jobParams.findMany({
+      where: {
+        active: true,
+      },
+    });
     if (jobs.length < 1) return;
     for (const j of jobs) {
       const job = new Job(j);
-      console.log(job);
-      await app.bree.add(job.breeOptions());
+      await app.bree.add(job.breeOptions);
     }
     app.bree.on("error", (err) => {
       app.log.info(err);
     });
     return await app.bree.start();
+  });
+
+  app.addHook("onClose", async function () {
+    await app.bree.stop();
   });
 
   app.get("/", async (_request: FastifyRequest, _reply: FastifyReply) => {
