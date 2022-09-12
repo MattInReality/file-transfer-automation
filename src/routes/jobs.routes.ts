@@ -32,6 +32,7 @@ export const jobRoutes = async function (
     },
     required: ["name", "jobRunner", "jobDataId"],
   });
+
   fastify.get("/", {
     schema: {
       response: {
@@ -103,6 +104,7 @@ export const jobRoutes = async function (
       return fastify.prisma.jobParams.findMany(query);
     },
   });
+
   fastify.post("/", {
     schema: {
       response: {
@@ -153,6 +155,8 @@ export const jobRoutes = async function (
         jobRunner,
         jobDataId,
         active,
+        timeout,
+        interval,
       };
 
       if (cron) {
@@ -164,16 +168,6 @@ export const jobRoutes = async function (
         data.cron = cronResult.getValue().toString();
       }
 
-      data = {
-        name,
-        jobRunner,
-        cron,
-        timeout,
-        interval,
-        active,
-        jobDataId,
-      };
-
       const created = await fastify.prisma.jobParams.create({
         data,
       });
@@ -182,24 +176,153 @@ export const jobRoutes = async function (
         const job = new Job(created);
         await fastify.bree.add(job.breeOptions);
         await fastify.bree.start(job.breeOptions.name);
-        return { message: `${created.name} started` };
       }
 
-      return { message: `${created.name} added to the database` };
+      return created;
     },
   });
+
   fastify.get("/:id", {
-    schema: {},
-    handler: async (request: FastifyRequest, reply: FastifyReply) => {
-      return { message: "Hi, from GET one" };
+    schema: {
+      response: {
+        200: {
+          description: "Get a single job by ID",
+          type: "object",
+          properties: {
+            id: { type: "number" },
+            name: { type: "string" },
+            jobRunner: { type: "string" },
+            jobDataId: { type: "integer" },
+            cron: { type: "string" },
+            timeout: { type: "integer" },
+            interval: { type: "integer" },
+            active: { type: "boolean" },
+            createdAt: { type: "string" },
+            updatedAt: { type: "string" },
+            lastRanAt: { type: "string" },
+            lastFailedAt: { type: "string" },
+            lastFailErrorMessage: { type: "string" },
+          },
+        },
+      },
+      params: {
+        id: {
+          type: "number",
+        },
+      },
+    },
+    handler: async (
+      request: FastifyRequest<{ Params: { id: number } }>,
+      reply: FastifyReply
+    ) => {
+      const jobData = await fastify.prisma.jobParams.findUnique({
+        where: {
+          id: request.params.id,
+        },
+      });
+      if (!jobData) {
+        reply.status(404);
+        return { message: "Job not found" };
+      }
+      return jobData;
     },
   });
+
   fastify.put("/:id", {
-    schema: {},
-    handler: async (request, reply) => {
-      return { message: "Hi, PUT one" };
+    schema: {
+      response: {
+        204: {
+          description: "Update the details of a job",
+          type: "object",
+          properties: {
+            id: { type: "string" },
+            name: { type: "string" },
+            jobRunner: { type: "string" },
+            jobDataId: { type: "integer" },
+            cron: { type: "string" },
+            timeout: { type: "integer" },
+            interval: { type: "integer" },
+            active: { type: "boolean" },
+            updatedAt: { type: "string" },
+          },
+        },
+      },
+      params: {
+        id: {
+          type: "number",
+        },
+      },
+      body: {
+        type: "object",
+        properties: {
+          name: { type: "string" },
+          jobRunner: { type: "string" },
+          jobDataId: { type: "integer" },
+          cron: { type: "string" },
+          timeout: { type: "integer" },
+          interval: { type: "integer" },
+          active: { type: "boolean" },
+        },
+        required: [
+          "name",
+          "jobRunner",
+          "jobDataId",
+          "cron",
+          "timeout",
+          "interval",
+          "active",
+        ],
+      },
+    },
+    handler: async (
+      request: FastifyRequest<{ Params: { id: number }; Body: JobParams }>,
+      reply: FastifyReply
+    ) => {
+      const originalState = await fastify.prisma.jobParams.findUnique({
+        where: {
+          id: request.params.id,
+        },
+      });
+
+      if (!originalState) {
+        reply.status(404);
+        return { message: "Job not found" };
+      }
+
+      if (originalState.active) {
+        await fastify.bree.stop(originalState.name);
+        await fastify.bree.remove(originalState.name);
+      }
+
+      const { name, jobRunner, jobDataId, cron, timeout, interval, active } =
+        request.body || {};
+
+      let data: Prisma.JobParamsUpdateInput = {
+        name,
+        jobRunner,
+        jobDataId,
+        cron,
+        timeout,
+        interval,
+        active,
+      };
+      const updated = await fastify.prisma.jobParams.update({
+        where: {
+          id: request.params.id,
+        },
+        data,
+      });
+
+      if (updated.active) {
+        const job = new Job(updated);
+        await fastify.bree.add(job.breeOptions);
+        await fastify.bree.start(job.breeOptions.name);
+      }
+
+      return updated;
     },
   });
+
   fastify.delete("/:id", {
     schema: {},
     handler: async (request: FastifyRequest, reply: FastifyReply) => {
