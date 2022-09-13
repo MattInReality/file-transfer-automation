@@ -44,23 +44,20 @@ const build = function (opts = {}) {
         await app.bree.add(job.breeOptions);
       } catch (e: any) {
         // If anything goes wrong with a job on start I want the job made inactive and updated with the error message.
-        const date = new Date();
+
         await app.prisma.jobParams.update({
           where: {
             id: j.id,
           },
           data: {
             active: false,
-            lastFailedAt: date,
+            lastFailedAt: new Date(),
             lastFailErrorMessage: e.message || "Configuration Error",
           },
         });
-        await app.bree.stop(job.breeOptions.name);
-        await app.bree.remove(job.breeOptions.name);
       }
     }
     app.bree.on("error", (err) => {
-      console.log("JACK JACK JACK");
       app.log.info(err);
     });
     return await app.bree.start();
