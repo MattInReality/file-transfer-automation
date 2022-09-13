@@ -121,6 +121,8 @@ export const jobRoutes = async function (
             timeout: { type: "integer" },
             interval: { type: "integer" },
             active: { type: "boolean" },
+            lastFailedAt: { type: "string" },
+            lastFailErrorMessage: { type: "string" },
           },
         },
       },
@@ -158,24 +160,41 @@ export const jobRoutes = async function (
         timeout,
         interval,
       };
-
+      // Check cron is valid and return early if not
       if (cron) {
         const cronResult = cronValidate(cron);
         if (cronResult.isError()) {
           reply.status(400);
-          throw new Error("Not a valid cron.");
+          return { message: "Not a valid cron." };
         }
-        data.cron = cronResult.getValue().toString();
+        data.cron = cron;
       }
 
       const created = await fastify.prisma.jobParams.create({
         data,
       });
-
+      // The job needs to be added to bree, but if bree doesn't like it, it will throw an error that will crash the app.
+      // Below we handle just that error and update the DB to make the job inactive and return the error to the user in the post response.
       if (created.active) {
         const job = new Job(created);
-        await fastify.bree.add(job.breeOptions);
-        await fastify.bree.start(job.breeOptions.name);
+        try {
+          await fastify.bree.add(job.breeOptions);
+          await fastify.bree.start(job.breeOptions.name);
+        } catch (e: any) {
+          await fastify.prisma.jobParams.update({
+            where: {
+              id: created.id,
+            },
+            data: {
+              active: false,
+              lastFailedAt: new Date(),
+              lastFailErrorMessage: e.message || "Configuration Error",
+            },
+          });
+        }
+        fastify.log.warn(
+          `Job ${created.id}: ${created.name} has a configuration error and will has been made inactive.`
+        );
       }
 
       return created;
@@ -244,6 +263,8 @@ export const jobRoutes = async function (
             interval: { type: "integer" },
             active: { type: "boolean" },
             updatedAt: { type: "string" },
+            lastFailedAt: { type: "string" },
+            lastFailErrorMessage: { type: "string" },
           },
         },
       },
@@ -301,11 +322,18 @@ export const jobRoutes = async function (
         name,
         jobRunner,
         jobDataId,
-        cron,
         timeout,
         interval,
         active,
       };
+      if (cron) {
+        const cronResult = cronValidate(cron);
+        if (cronResult.isError()) {
+          reply.status(400);
+          return { message: "Not a valid cron." };
+        }
+        data.cron = cron;
+      }
       const updated = await fastify.prisma.jobParams.update({
         where: {
           id: request.params.id,
@@ -315,8 +343,26 @@ export const jobRoutes = async function (
 
       if (updated.active) {
         const job = new Job(updated);
-        await fastify.bree.add(job.breeOptions);
-        await fastify.bree.start(job.breeOptions.name);
+        if (updated.active) {
+          try {
+            await fastify.bree.add(job.breeOptions);
+            await fastify.bree.start(job.breeOptions.name);
+          } catch (e: any) {
+            await fastify.prisma.jobParams.update({
+              where: {
+                id: updated.id,
+              },
+              data: {
+                active: false,
+                lastFailedAt: new Date(),
+                lastFailErrorMessage: e.message || "Configuration Error",
+              },
+            });
+          }
+          fastify.log.warn(
+            `Job ${updated.id}: ${updated.name} has a configuration error and will has been made inactive.`
+          );
+        }
       }
 
       return updated;
