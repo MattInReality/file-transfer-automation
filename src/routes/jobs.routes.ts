@@ -165,7 +165,7 @@ export const jobRoutes = async function (
           reply.status(400);
           throw new Error("Not a valid cron.");
         }
-        data.cron = cronResult.getValue().toString();
+        data.cron = cron;
       }
 
       const created = await fastify.prisma.jobParams.create({
@@ -324,9 +324,41 @@ export const jobRoutes = async function (
   });
 
   fastify.delete("/:id", {
-    schema: {},
-    handler: async (request: FastifyRequest, reply: FastifyReply) => {
-      return { message: "Hi, DELETE one" };
+    schema: {
+      response: {
+        200: {
+          description:
+            "Deleted a job by ID and remove it from the scheduler if running.",
+          type: "object",
+          properties: {
+            message: {
+              type: "string",
+            },
+          },
+        },
+      },
+      params: {
+        id: {
+          type: "number",
+        },
+      },
+    },
+    handler: async (
+      request: FastifyRequest<{ Params: { id: number } }>,
+      _reply: FastifyReply
+    ) => {
+      const deleted = await fastify.prisma.jobParams.delete({
+        where: {
+          id: request.params.id,
+        },
+      });
+
+      if (deleted.active) {
+        await fastify.bree.stop(deleted.name);
+        await fastify.bree.remove(deleted.name);
+      }
+
+      return { message: "Job Deleted" };
     },
   });
 };
