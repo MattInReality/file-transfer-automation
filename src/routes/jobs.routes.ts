@@ -165,7 +165,7 @@ export const jobRoutes = async function (
           reply.status(400);
           throw new Error("Not a valid cron.");
         }
-        data.cron = cron;
+        data.cron = cronResult.getValue().toString();
       }
 
       const created = await fastify.prisma.jobParams.create({
