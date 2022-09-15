@@ -9,6 +9,7 @@ import { SHARE_ENV } from "worker_threads";
 //Plugins
 import prismaPlugin from "./plugins/prisma";
 import FastifyBree from "fastify-bree";
+import jobUtils from "./plugins/job.utils";
 
 //Routes
 import { routes } from "./routes/index.routes";
@@ -18,10 +19,10 @@ import { Job } from "./Scheduling/Job";
 const root = path.resolve(__dirname, "./jobs");
 
 const build = function (opts = {}) {
-  const app: FastifyInstance = Fastify(opts);
+  const fastify: FastifyInstance = Fastify(opts);
 
-  app.register(prismaPlugin);
-  app.register(FastifyBree, {
+  fastify.register(prismaPlugin);
+  fastify.register(FastifyBree, {
     customOptions: {
       root,
       worker: { env: SHARE_ENV },
@@ -30,9 +31,10 @@ const build = function (opts = {}) {
     },
     autoStart: false,
   });
+  fastify.register(jobUtils);
 
-  app.addHook("onReady", async function () {
-    const jobs = await app.prisma.jobParams.findMany({
+  fastify.addHook("onReady", async function () {
+    const jobs = await fastify.prisma.jobParams.findMany({
       where: {
         active: true,
       },
@@ -41,39 +43,27 @@ const build = function (opts = {}) {
     for (const j of jobs) {
       const job = new Job(j);
       try {
-        await app.bree.add(job.breeOptions);
+        await fastify.bree.add(job.breeOptions);
       } catch (e: any) {
-        // If anything goes wrong with a job on start I want the job made inactive and updated with the error message.
+        // If anything goes wrong with a job on start I want the job made inactive and updated with the error message and made inactive.
 
-        await app.prisma.jobParams.update({
-          where: {
-            id: j.id,
-          },
-          data: {
-            active: false,
-            lastFailedAt: new Date(),
-            lastFailErrorMessage: e.message || "Configuration Error",
-          },
-        });
+        await fastify.jobUtils.handleBadJob(j, e);
       }
     }
-    app.bree.on("error", (err) => {
-      app.log.info(err);
-    });
-    return await app.bree.start();
+    return await fastify.bree.start();
   });
 
-  app.addHook("onClose", async function () {
-    await app.bree.stop();
+  fastify.addHook("onClose", async function () {
+    await fastify.bree.stop();
   });
 
-  app.get("/", async (_request: FastifyRequest, _reply: FastifyReply) => {
+  fastify.get("/", async (_request: FastifyRequest, _reply: FastifyReply) => {
     return { message: "Hello World" };
   });
 
-  app.register(routes, { prefix: "/api" });
+  fastify.register(routes, { prefix: "/api" });
 
-  return app;
+  return fastify;
 };
 
 export default build;

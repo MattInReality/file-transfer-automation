@@ -77,7 +77,7 @@ export const jobRoutes = async function (
       }>,
       _reply: FastifyReply
     ) => {
-      // Going to use the JSON shchema to control what data is returned. Even prisma says limiting horizontal data in the query doesn't save on performance unless the entity is huge.
+      // Going to use the JSON schema to control what data is returned. Even prisma says limiting horizontal data in the query doesn't save on performance unless the entity is huge.
       let query: Prisma.JobParamsFindManyArgs = {};
 
       // Allow for checking running jobs.
@@ -181,20 +181,8 @@ export const jobRoutes = async function (
           await fastify.bree.add(job.breeOptions);
           await fastify.bree.start(job.breeOptions.name);
         } catch (e: any) {
-          await fastify.prisma.jobParams.update({
-            where: {
-              id: created.id,
-            },
-            data: {
-              active: false,
-              lastFailedAt: new Date(),
-              lastFailErrorMessage: e.message || "Configuration Error",
-            },
-          });
+          await fastify.jobUtils.handleBadJob(created, e);
         }
-        fastify.log.warn(
-          `Job ${created.id}: ${created.name} has a configuration error and will has been made inactive.`
-        );
       }
 
       return created;
@@ -348,20 +336,8 @@ export const jobRoutes = async function (
             await fastify.bree.add(job.breeOptions);
             await fastify.bree.start(job.breeOptions.name);
           } catch (e: any) {
-            await fastify.prisma.jobParams.update({
-              where: {
-                id: updated.id,
-              },
-              data: {
-                active: false,
-                lastFailedAt: new Date(),
-                lastFailErrorMessage: e.message || "Configuration Error",
-              },
-            });
+            await fastify.jobUtils.handleBadJob(updated, e);
           }
-          fastify.log.warn(
-            `Job ${updated.id}: ${updated.name} has a configuration error and will has been made inactive.`
-          );
         }
       }
 

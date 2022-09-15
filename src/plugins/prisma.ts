@@ -1,23 +1,26 @@
 import fp from "fastify-plugin";
-import { FastifyPluginAsync } from "fastify";
-import { PrismaClient } from "@prisma/client";
+import { FastifyInstance, FastifyPluginAsync } from "fastify";
+import { PrismaClient, JobParams } from "@prisma/client";
 
 declare module "fastify" {
   interface FastifyInstance {
     prisma: PrismaClient;
+    jobUtils: { handleBadJob: (job: JobParams, err: any) => void };
   }
 }
 
-const prismaPlugin: FastifyPluginAsync = fp(async (server, options) => {
-  const prisma = new PrismaClient();
+const prismaPlugin: FastifyPluginAsync = fp(
+  async (fastify: FastifyInstance, _options) => {
+    const prisma = new PrismaClient();
 
-  await prisma.$connect();
+    await prisma.$connect();
 
-  server.decorate("prisma", prisma);
+    fastify.decorate("prisma", prisma);
 
-  server.addHook("onClose", async (server) => {
-    await server.prisma.$disconnect();
-  });
-});
+    fastify.addHook("onClose", async (server) => {
+      await server.prisma.$disconnect();
+    });
+  }
+);
 
 export default prismaPlugin;
