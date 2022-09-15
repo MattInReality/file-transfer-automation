@@ -6,7 +6,7 @@ import {
 } from "fastify";
 import cronValidate from "cron-validate";
 import { JobParams, Prisma } from "@prisma/client";
-import { Job } from "../Scheduling/Job";
+import { Job } from "../services/Scheduling/Job";
 
 export const jobRoutes = async function (
   fastify: FastifyInstance,

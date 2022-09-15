@@ -14,7 +14,7 @@ import jobUtils from "./plugins/job.utils";
 //Routes
 import { routes } from "./routes/index.routes";
 import { appLogger } from "./logger";
-import { Job } from "./Scheduling/Job";
+import { Job } from "./services/Scheduling/Job";
 
 const root = path.resolve(__dirname, "./jobs");
 
