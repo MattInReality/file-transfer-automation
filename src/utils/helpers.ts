@@ -1,7 +1,7 @@
 import path, { join } from "path";
 import { parentPort } from "worker_threads";
 
-export const baseDir = path.resolve(__dirname, "./");
+export const baseDir = path.resolve(__dirname, "../");
 
 export const getPathRelativeToRoot = (directoryName: string): string => {
   return join(baseDir, directoryName);

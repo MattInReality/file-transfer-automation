@@ -1,6 +1,7 @@
 import path from "path";
 import { JobParams } from "@prisma/client";
 import { JobOptions } from "bree";
+import { getPathRelativeToRoot } from "../../utils/helpers";
 
 export type RequiredJobParams = Required<
   Pick<JobParams, "name" | "jobDataId" | "id" | "jobRunner">
@@ -13,9 +14,8 @@ export class Job {
   get breeOptions(): JobOptions {
     return {
       name: this.jobParams.name || "",
-      //TODO: How can I add an error check for file existence on a worker.
       path: path.join(
-        path.resolve(__dirname, "../jobs"),
+        getPathRelativeToRoot("./jobs"),
         `${this.jobParams.jobRunner}.js`
       ),
       timeout: this.jobParams.timeout ?? 0,

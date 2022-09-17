@@ -1,6 +1,6 @@
 import build from "./api";
 import Graceful from "@ladjs/graceful";
-import { appLogger } from "./logger";
+import { appLogger } from "./services/logger";
 
 process.on("unhandledRejection", (error) => {
   console.error(error);

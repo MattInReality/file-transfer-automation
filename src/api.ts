@@ -13,7 +13,7 @@ import jobUtils from "./plugins/job.utils";
 
 //Routes
 import { routes } from "./routes/index.routes";
-import { appLogger } from "./logger";
+import { appLogger } from "./services/logger";
 import { Job } from "./services/Scheduling/Job";
 
 const root = path.resolve(__dirname, "./jobs");
