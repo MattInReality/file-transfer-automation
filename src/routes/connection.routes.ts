@@ -101,13 +101,19 @@ export const connectionRoutes = async function routes(
         Params: { id: number };
         Querystring: { test: string };
       }>,
-      _reply: FastifyReply
+      reply: FastifyReply
     ) => {
       const id = request.params.id;
 
-      return await fastify.prisma.connection.findUnique({
+      const connection = await fastify.prisma.connection.findUnique({
         where: { id: id },
       });
+
+      if (!connection) {
+        reply.status(404);
+        return { message: "Connection not found" };
+      }
+      return connection;
     },
   });
 

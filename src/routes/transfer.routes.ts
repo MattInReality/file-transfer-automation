@@ -111,9 +111,9 @@ export const transferRoutes = async function (
     },
     handler: async (
       request: FastifyRequest<{ Params: { id: number } }>,
-      _reply: FastifyReply
+      reply: FastifyReply
     ) => {
-      return fastify.prisma.transfer.findUnique({
+      const transfer = await fastify.prisma.transfer.findUnique({
         where: {
           id: request.params.id,
         },
@@ -132,6 +132,11 @@ export const transferRoutes = async function (
           },
         },
       });
+      if (!transfer) {
+        reply.status(404);
+        return { message: "Transfer not found" };
+      }
+      return transfer;
     },
   });
 
