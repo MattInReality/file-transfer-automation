@@ -9,10 +9,12 @@ type requestMethods = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 export class HTTPConnection implements Connection {
   private readonly baseUrl: string;
   private readonly apiKey: string | undefined;
+  private readonly name: string;
 
   constructor(private readonly connectionOptions: ConnectionOptions) {
     this.baseUrl = connectionOptions.host;
     this.apiKey = connectionOptions.apiKey ?? undefined;
+    this.name = connectionOptions.name;
   }
 
   _open() {}
@@ -74,5 +76,21 @@ export class HTTPConnection implements Connection {
     }
     options.headers = headers;
     return options;
+  };
+
+  test = async (
+    directory: string = "/"
+  ): Promise<[string | undefined, string | undefined]> => {
+    const endPoint = path.join(this.baseUrl, directory);
+    const initOptions = this.createRequestInit("GET");
+    try {
+      const response = await fetch(endPoint, initOptions);
+      if (!response.ok) {
+        return [undefined, response.statusText];
+      }
+      return [`${this.name} connected successfully`, undefined];
+    } catch (e: any) {
+      return [undefined, e.message];
+    }
   };
 }

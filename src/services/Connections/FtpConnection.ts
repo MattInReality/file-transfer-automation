@@ -9,6 +9,7 @@ export class FtpConnection implements Connection {
   private readonly password: string | undefined;
   private readonly secure: boolean | undefined;
   private readonly host: string | undefined;
+  private readonly name: string;
 
   constructor(private readonly connectionOptions: ConnectionOptions) {
     this.client = new ftp.Client();
@@ -16,6 +17,7 @@ export class FtpConnection implements Connection {
     this.password = connectionOptions.password ?? "";
     this.host = connectionOptions.host;
     this.secure = connectionOptions.secure ?? undefined;
+    this.name = connectionOptions.name;
     // this.client.ftp.verbose = true;
   }
 
@@ -45,14 +47,25 @@ export class FtpConnection implements Connection {
     }
   };
 
-  upload = async (localPath: Readable, to: string): Promise<void> => {
+  upload = async (_localPath: Readable, _to: string): Promise<void> => {
     try {
       await this._open();
-      await this.client.uploadFrom(localPath, to);
       return;
     } catch (e: any) {
       console.error("ftpConnection upload error!");
       throw new Error(e.message);
+    } finally {
+      await this._close();
+    }
+  };
+  test = async (
+    _directory: string = "/"
+  ): Promise<[string | undefined, string | undefined]> => {
+    try {
+      await this._open();
+      return [`${this.name} connected successfully`, undefined];
+    } catch (e: any) {
+      return [undefined, e.message];
     } finally {
       await this._close();
     }

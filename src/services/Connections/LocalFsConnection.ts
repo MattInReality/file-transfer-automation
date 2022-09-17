@@ -6,8 +6,10 @@ import path from "path";
 
 export class LocalFsConnection implements Connection {
   private readonly baseUrl: string;
+  private readonly name: string;
   constructor(private readonly connectionOptions: ConnectionOptions) {
     this.baseUrl = connectionOptions.host;
+    this.name = connectionOptions.name;
   }
   _open() {
     return Promise.resolve();
@@ -44,6 +46,18 @@ export class LocalFsConnection implements Connection {
       throw new Error(e.message);
     } finally {
       await readStream?.close();
+    }
+  };
+
+  test = async (
+    directory: string = "/"
+  ): Promise<[string | undefined, string | undefined]> => {
+    const targetPath = path.join(this.baseUrl, directory);
+    try {
+      await open(targetPath);
+      return [`${this.name} connected successfully`, undefined];
+    } catch (e: any) {
+      return [undefined, e.message];
     }
   };
 }

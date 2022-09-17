@@ -6,6 +6,7 @@ import {
 } from "fastify";
 import { Connection, Prisma } from "@prisma/client";
 import { getPathRelativeToRoot } from "../helpers";
+import { ConnectionFactory } from "../services/Connections/ConnectionFactory";
 
 export const connectionRoutes = async function routes(
   fastify: FastifyInstance,
@@ -88,16 +89,56 @@ export const connectionRoutes = async function routes(
       params: {
         id: { type: "number" },
       },
+      querystring: {
+        test: {
+          type: "string",
+        },
+      },
     },
 
     handler: async (
-      request: FastifyRequest<{ Params: { id: number } }>,
+      request: FastifyRequest<{
+        Params: { id: number };
+        Querystring: { test: string };
+      }>,
       _reply: FastifyReply
     ) => {
       const id = request.params.id;
+
       return await fastify.prisma.connection.findUnique({
         where: { id: id },
       });
+    },
+  });
+
+  fastify.get("/test/:id", {
+    schema: {
+      params: {
+        id: {
+          type: "integer",
+        },
+      },
+    },
+    handler: async (
+      request: FastifyRequest<{ Params: { id: number } }>,
+      reply: FastifyReply
+    ) => {
+      const connectionOptions = await fastify.prisma.connection.findUnique({
+        where: { id: request.params.id },
+      });
+
+      if (!connectionOptions) {
+        reply.status(400);
+        return { message: "Connection not found" };
+      }
+
+      const connection = ConnectionFactory.create(connectionOptions);
+      const [success, err] = await connection.test("/");
+      if (err) {
+        reply.status(404);
+        return { message: err };
+      }
+      return { message: success };
     },
   });
 

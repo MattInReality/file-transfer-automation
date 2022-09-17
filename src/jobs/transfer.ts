@@ -1,6 +1,6 @@
 import { workerData } from "worker_threads";
 import { PrismaClient } from "@prisma/client";
-import { TransferBroker } from "../Transfer/TransferBroker";
+import { TransferBroker } from "../services/Transfer/TransferBroker";
 import { jobWorkerMessageReceiver } from "../helpers";
 
 (async () => {

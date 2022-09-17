@@ -8,6 +8,10 @@ export abstract class Connection {
   abstract download(remotePath: string, to: Writable): Promise<void>;
 
   abstract upload(localPath: Readable, to: string): Promise<void>;
+
+  abstract test(
+    directory: string
+  ): Promise<[string | undefined, string | undefined]>;
 }
 
 // What is the use of host in Local? What about protecting the application/server

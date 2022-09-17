@@ -8,6 +8,7 @@ export class SftpConnection implements Connection {
   private readonly password: string | undefined;
   private readonly host: string | undefined;
   private readonly port: number | undefined;
+  private readonly name: string;
 
   constructor(private readonly connectionOptions: ConnectionOptions) {
     this.client = new Client();
@@ -15,6 +16,7 @@ export class SftpConnection implements Connection {
     this.username = connectionOptions.username ?? "";
     this.password = connectionOptions.password ?? "";
     this.port = connectionOptions.port ?? 22;
+    this.name = connectionOptions.name;
   }
 
   _open = async () =>
@@ -48,6 +50,20 @@ export class SftpConnection implements Connection {
     } catch (e: any) {
       console.error("sFtpConnection upload error!");
       throw new Error(e.message);
+    } finally {
+      await this._close();
+    }
+  };
+
+  test = async (
+    directory: string = "/"
+  ): Promise<[string | undefined, string | undefined]> => {
+    try {
+      await this._open();
+      await this.client.exists(directory);
+      return [`${this.name} connected successfully`, undefined];
+    } catch (e: any) {
+      return [undefined, e.message];
     } finally {
       await this._close();
     }
