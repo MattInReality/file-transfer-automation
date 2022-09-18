@@ -7,7 +7,7 @@ export const getPathRelativeToRoot = (directoryName: string): string => {
   return join(baseDir, directoryName);
 };
 
-export const jobWorkerMessageReceiver = (
+export const jobWorkerMessageHandler = (
   message: string,
   isError: boolean = false
 ): void => {

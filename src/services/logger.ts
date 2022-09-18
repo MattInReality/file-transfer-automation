@@ -9,6 +9,11 @@ const env = process.env.NODE_ENV || "development";
 const automationLogger = pino({
   transport: {
     target: "pino-pretty",
+    options: {
+      colorize: true,
+      translateTime: "SYS:yyyy-mm-dd hh:MM:ss",
+      ignore: "hostname",
+    },
   },
   customLevels: {
     log: 30,

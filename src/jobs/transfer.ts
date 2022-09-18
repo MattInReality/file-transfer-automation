@@ -1,7 +1,7 @@
 import { workerData } from "worker_threads";
 import { PrismaClient } from "@prisma/client";
 import { TransferBroker } from "../services/Transfer/TransferBroker";
-import { jobWorkerMessageReceiver } from "../utils/helpers";
+import { jobWorkerMessageHandler } from "../utils/helpers";
 
 (async () => {
   const prisma = new PrismaClient();
@@ -22,21 +22,23 @@ import { jobWorkerMessageReceiver } from "../utils/helpers";
     });
 
     if (!transferData) {
-      return jobWorkerMessageReceiver("Transfer Data not found");
+      return jobWorkerMessageHandler("Transfer Data not found");
     }
 
     const transferBroker = new TransferBroker(transferData);
     await prisma.$disconnect();
     await transferBroker.makeTransfer();
-    await prisma.jobParams.update({
+    const updatedJob = await prisma.jobParams.update({
       where: { id: jobId },
       data: { lastRanAt: new Date() },
     });
-    jobWorkerMessageReceiver(
-      `Transfer ${jobId} Complete at ${new Date().toLocaleTimeString()}`
+    jobWorkerMessageHandler(
+      `Transfer ${
+        updatedJob.name
+      } (Job ID: ${jobId}) Complete at ${new Date().toLocaleTimeString()}`
     );
   } catch (e: any) {
     await prisma.$disconnect();
-    jobWorkerMessageReceiver(e.message, true);
+    jobWorkerMessageHandler(e.message, e);
   }
 })();
