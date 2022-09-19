@@ -1,5 +1,6 @@
 import path from "path";
 import Fastify, {
+  FastifyError,
   FastifyInstance,
   FastifyReply,
   FastifyRequest,
@@ -20,7 +21,80 @@ const root = path.resolve(__dirname, "./jobs");
 
 const build = function (opts = {}) {
   const fastify: FastifyInstance = Fastify(opts);
+  fastify.setErrorHandler(function (
+    error: FastifyError,
+    request: FastifyRequest,
+    reply: FastifyReply
+  ) {
+    // Handling Prisma Errors - sorry for the wall of references.
+    if (error?.code.charAt(0) === "P") {
+      const codeMap: { [key: string]: number } = {
+        P2000: 400,
+        P2001: 404,
+        P2002: 409,
+        P2003: 409,
+        P2004: 409,
+        P2005: 400,
+        P2006: 400,
+        P2007: 400,
+        P2008: 500,
+        P2009: 500,
+        P2010: 500,
+        P2011: 409,
+        P2012: 400,
+        P2013: 400,
+        P2014: 400,
+        P2015: 500,
+        P2016: 500,
+        P2017: 400,
+        P2018: 404,
+        P2019: 400,
+        P2020: 400,
+        P2021: 404,
+        P2022: 404,
+        P2023: 400,
+        P2024: 408,
+        P2025: 400,
+        P2027: 500,
+        P2030: 501,
+        P2031: 501,
+        P2033: 400,
+      };
 
+      const errorMap: { [key: number]: string } = {
+        400: "Bad Request",
+        404: "Not Found",
+        408: "Request Timeout",
+        409: "Conflict",
+        500: "Internal Server Error",
+        501: "Not Implemented",
+      };
+
+      const errorCode = codeMap[error.code];
+      const errorName = errorMap[errorCode];
+
+      fastify.log.error(`Prisma Code: ${error.code}: ${error.message}`);
+
+      reply.code(errorCode);
+      return reply.send({
+        statusCode: errorCode,
+        error: errorName,
+        //@ts-ignore because prisma is throwing these errors regardless.
+        message: error.meta.cause ?? "Entity not found",
+      });
+    } else {
+      const statusCode = error.statusCode || 500;
+      if (statusCode >= 500) {
+        fastify.log.error(error);
+      } else if (statusCode >= 400) {
+        fastify.log.info(error);
+      } else {
+        fastify.log.error(error);
+      }
+      reply.code(statusCode);
+      return reply.send(error);
+    }
+  });
   fastify.register(prismaPlugin);
   fastify.register(FastifyBree, {
     customOptions: {
