@@ -7,7 +7,10 @@ process.on("unhandledRejection", (error) => {
 });
 
 const server = build({
-  logger: true,
+  logger: process.env.NODE_ENV !== "production",
+  ajv: {
+    removeAdditional: "all",
+  },
 });
 
 server.listen({ port: 3000 }).then(() => {
