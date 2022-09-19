@@ -165,7 +165,11 @@ export const jobRoutes = async function (
         const cronResult = cronValidate(cron);
         if (cronResult.isError()) {
           reply.status(400);
-          return { message: "Not a valid cron." };
+          return {
+            statusCode: 400,
+            name: "Bad Request",
+            message: "Not a valid cron.",
+          };
         }
         data.cron = cron;
       }
@@ -261,6 +265,14 @@ export const jobRoutes = async function (
           type: "number",
         },
       },
+      querystring: {
+        type: "object",
+        properties: {
+          clearerrors: {
+            type: "boolean",
+          },
+        },
+      },
       body: {
         type: "object",
         properties: {
@@ -284,7 +296,11 @@ export const jobRoutes = async function (
       },
     },
     handler: async (
-      request: FastifyRequest<{ Params: { id: number }; Body: JobParams }>,
+      request: FastifyRequest<{
+        Params: { id: number };
+        Querystring: { clearerrors: boolean };
+        Body: JobParams;
+      }>,
       reply: FastifyReply
     ) => {
       const originalState = await fastify.prisma.jobParams.findUnique({
@@ -295,7 +311,11 @@ export const jobRoutes = async function (
 
       if (!originalState) {
         reply.status(404);
-        return { message: "Job not found" };
+        return {
+          statusCode: 404,
+          name: "Resource not found",
+          message: "Job not found",
+        };
       }
 
       if (originalState.active) {
@@ -318,9 +338,17 @@ export const jobRoutes = async function (
         const cronResult = cronValidate(cron);
         if (cronResult.isError()) {
           reply.status(400);
-          return { message: "Not a valid cron." };
+          return {
+            statusCode: 400,
+            name: "Bad Request",
+            message: "Not a valid cron.",
+          };
         }
         data.cron = cron;
+      }
+      if (request.query.clearerrors) {
+        data.lastFailedAt = null;
+        data.lastFailErrorMessage = null;
       }
       const updated = await fastify.prisma.jobParams.update({
         where: {
