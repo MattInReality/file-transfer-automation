@@ -7,7 +7,8 @@ process.on("unhandledRejection", (error) => {
 });
 
 const server = build({
-  logger: process.env.NODE_ENV !== "production",
+  logger:
+    process.env.NODE_ENV !== "production" || process.env.APILOGGING === "true",
   ajv: {
     removeAdditional: "all",
   },
