@@ -37,7 +37,19 @@ export const connectionRoutes = async function routes(
           description: "Get all connections",
           type: "array",
           items: {
-            $ref: "connection#",
+            description: "Connection data without password or API Keys",
+            type: "object",
+            properties: {
+              id: { type: "number" },
+              connectionType: { type: "string" },
+              name: { type: "string" },
+              host: { type: "string" },
+              port: { type: "integer" },
+              username: { type: "string" },
+              secure: { type: "boolean" },
+              createdAt: { type: "string" },
+              updatedAt: { type: "string" },
+            },
           },
         },
       },
@@ -53,11 +65,33 @@ export const connectionRoutes = async function routes(
         201: {
           description: "Create a new connection",
           type: "object",
-          $ref: "connection#",
+          properties: {
+            id: { type: "number" },
+            connectionType: { type: "string" },
+            name: { type: "string" },
+            host: { type: "string" },
+            port: { type: "integer" },
+            username: { type: "string" },
+            secure: { type: "boolean" },
+            createdAt: { type: "string" },
+            updatedAt: { type: "string" },
+          },
         },
       },
       body: {
-        $ref: "connection#",
+        description: "Required connection properties",
+        type: "object",
+        properties: {
+          connectionType: { type: "string" },
+          name: { type: "string" },
+          host: { type: "string" },
+          port: { type: "integer" },
+          username: { type: "string" },
+          password: { type: "string" },
+          apiKey: { type: "string" },
+          secure: { type: "boolean" },
+        },
+        required: ["name", "host", "connectionType"],
       },
     },
     handler: async (
@@ -83,7 +117,17 @@ export const connectionRoutes = async function routes(
         201: {
           description: "Get a specific connection",
           type: "object",
-          $ref: "connection#",
+          properties: {
+            id: { type: "number" },
+            connectionType: { type: "string" },
+            name: { type: "string" },
+            host: { type: "string" },
+            port: { type: "integer" },
+            username: { type: "string" },
+            secure: { type: "boolean" },
+            createdAt: { type: "string" },
+            updatedAt: { type: "string" },
+          },
         },
       },
       params: {
@@ -111,7 +155,11 @@ export const connectionRoutes = async function routes(
 
       if (!connection) {
         reply.status(404);
-        return { message: "Connection not found" };
+        return {
+          statusCode: 404,
+          error: "Not Found",
+          message: "Connection not found",
+        };
       }
       return connection;
     },
@@ -135,7 +183,11 @@ export const connectionRoutes = async function routes(
 
       if (!connectionOptions) {
         reply.status(400);
-        return { message: "Connection not found" };
+        return {
+          statusCode: 404,
+          error: "Not Found",
+          message: "Connection not found",
+        };
       }
 
       const connection = ConnectionFactory.create(connectionOptions);
@@ -154,14 +206,34 @@ export const connectionRoutes = async function routes(
         204: {
           description: "Updates a connection",
           type: "object",
-          $ref: "connection#",
+          properties: {
+            id: { type: "number" },
+            connectionType: { type: "string" },
+            name: { type: "string" },
+            host: { type: "string" },
+            port: { type: "integer" },
+            username: { type: "string" },
+            secure: { type: "boolean" },
+            createdAt: { type: "string" },
+            updatedAt: { type: "string" },
+          },
         },
       },
       params: {
         id: { type: "number" },
       },
       body: {
-        $ref: "connection#",
+        type: "object",
+        properties: {
+          connectionType: { type: "string" },
+          name: { type: "string" },
+          host: { type: "string" },
+          port: { type: "integer" },
+          username: { type: "string" },
+          password: { type: "string" },
+          apiKey: { type: "string" },
+          secure: { type: "boolean" },
+        },
       },
     },
     handler: async (
