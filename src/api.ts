@@ -16,6 +16,7 @@ import jobUtils from "./plugins/job.utils";
 import { routes } from "./routes/index.routes";
 import { appLogger } from "./services/logger";
 import { Job } from "./services/Scheduling/Job";
+import fastifyCors from "@fastify/cors";
 
 const root = path.resolve(__dirname, "./jobs");
 
@@ -95,6 +96,7 @@ const build = function (opts = {}) {
       return reply.send(error);
     }
   });
+  fastify.register(fastifyCors, { origin: "*" });
   fastify.register(prismaPlugin);
   fastify.register(FastifyBree, {
     customOptions: {
