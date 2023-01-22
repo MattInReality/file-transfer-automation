@@ -1,67 +1,66 @@
 generator client {
-    provider = "prisma-client-js"
-    previewFeatures = ["fullTextSearch"]
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
 }
 
 datasource db {
-    provider = "postgresql"
-    url      = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
-    id        Int     @id @default(autoincrement())
-    firstName String
-    lastName  String
-    email     String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @default(now()) @updatedAt
+  id        Int      @id @default(autoincrement())
+  firstName String
+  lastName  String
+  email     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 }
 
 model Connection {
-    id              Int            @id @default(autoincrement())
-    connectionType  String
-    name            String         @unique
-    host            String
-    port            Int?
-    username        String?
-    password        String?
-    apiKey          String?
-    secure          Boolean?
-    transferSources Transfer[]     @relation("sourceOptions")
-    transferRemotes Transfer[]     @relation("remoteOptions")
-    createdAt       DateTime      @default(now())
-    updatedAt       DateTime      @default(now()) @updatedAt
+  id              Int        @id @default(autoincrement())
+  connectionType  String
+  name            String     @unique
+  host            String
+  port            Int?
+  username        String?
+  password        String?
+  apiKey          String?
+  secure          Boolean?
+  transferSources Transfer[] @relation("sourceOptions")
+  transferRemotes Transfer[] @relation("remoteOptions")
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @default(now()) @updatedAt
 }
 
 model Transfer {
-    id              Int    @id @default(autoincrement())
-    name            String @unique
+  id   Int    @id @default(autoincrement())
+  name String @unique
 
-    sourceOptionsId Int
-    sourceOptions   Connection @relation("sourceOptions", fields: [sourceOptionsId], references: [id])
+  sourceOptionsId Int
+  sourceOptions   Connection @relation("sourceOptions", fields: [sourceOptionsId], references: [id])
 
-    remoteOptionsId Int
-    remoteOptions   Connection @relation("remoteOptions", fields: [remoteOptionsId], references: [id])
+  remoteOptionsId Int
+  remoteOptions   Connection @relation("remoteOptions", fields: [remoteOptionsId], references: [id])
 
-    sourcePath      String
-    remotePath      String
-    createdAt       DateTime @default(now())
-    updatedAt       DateTime @default(now()) @updatedAt
+  sourcePath String
+  remotePath String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
 }
 
 model JobParams {
-    id                      Int     @id @default(autoincrement())
-    name                    String @unique
-    jobRunner               String
-    jobDataId               Int
-    cron                    String?
-    timeout                 Int? @default(0)
-    interval                Int? @default(0)
-    active                  Boolean @default(true)
-    createdAt               DateTime @default(now())
-    updatedAt               DateTime @default(now()) @updatedAt
-    lastRanAt               DateTime?
-    lastFailedAt            DateTime?
-    lastFailErrorMessage    String?
-
+  id                   Int       @id @default(autoincrement())
+  name                 String    @unique
+  jobRunner            String
+  jobDataId            Int
+  cron                 String?
+  timeout              Int?      @default(0)
+  interval             Int?      @default(0)
+  active               Boolean   @default(true)
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @default(now()) @updatedAt
+  lastRanAt            DateTime?
+  lastFailedAt         DateTime?
+  lastFailErrorMessage String?
 }
